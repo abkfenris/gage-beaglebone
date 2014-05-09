@@ -1,0 +1,11 @@
+Name = "Bull Branch, ME" # Friendly name for the gage
+Id = 1 # Gage ID number on server, check with server admin for an ID
+Password = "1234" # Password for luggage/uploading data to server for this gage
+Location = "Twin Bridges Road, Newry, ME" # Full human readable description of the gage
+Cordinates = [44.5029, -70.9147] # Gage location in decimal degrees. Easy to find either using something like Caltopo or a GPS reading when positioning the gage
+DepthAIN = "P9_40" # AIN that the ultrasonic sensor for depth is connected to
+PowerType = "solar" # Options for power source. If attached to the grid then use 'grid'. If using solar then use 'solar'
+PowerAIN = "P9_36" # AIN that the solar is connected to.
+BatteryType = "Lead" # Options for the battery to get power levels including 'Lead', 'LIon', 'LiPo' if grid tied use 'no'.
+BatteryAIN = "P9_38" # AIN that the battery is connected to.
+BatteryVoltage = 12 # Nominal battery voltage. Largely used for single/multi cell LIons or LiPos.
