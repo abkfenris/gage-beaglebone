@@ -4,8 +4,4 @@ import ultrasound
 # import power
 
 print "DepthAIN is " + config.DepthAIN
-print ultrasound.depthCheckMath(config.DepthAIN,6)
-
-
-print "PowerAIN is " + config.PowerAIN
-print power.powerCheckMath()
+print ultrasound.depthCheck(config.DepthAIN,6)
