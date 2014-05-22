@@ -27,6 +27,8 @@ def checkDepth(depthAIN="P9_40",j=3):
 	
 	for i in range(0,j):
 		ser.open()
+		ser.flushOutput()
+		ser.flushInput()
 		currentDepthList.append(int(ser.read(5)[1:4]))
 		ser.close()
 		#currentDepthList.append( ADC.read(depthAIN)*1.8/0.00699 ) # *1.8 to get voltage from 0 - 1.8 V, then /0.00699 to get depth and add it to our array
