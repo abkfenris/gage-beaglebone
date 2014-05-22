@@ -6,11 +6,12 @@ import time
 import numpy
 import config
 
+UART.setup(config.DepthUART)
 
 GPIO.setup(config.DepthGPIO, GPIO.OUT)
 
 ser = serial.Serial()
-ser.port = "/dev/ttyO2"
+ser.port = config.SerialDev
 ser.baudrate = 9600
 ser.bytesize = serial.EIGHTBITS
 ser.parity = serial.PARITY_NONE
