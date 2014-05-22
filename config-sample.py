@@ -9,3 +9,4 @@ PowerAIN = "P9_36" # AIN that the solar is connected to.
 BatteryType = "Lead" # Options for the battery to get power levels including 'Lead', 'LIon', 'LiPo' if grid tied use 'no'.
 BatteryAIN = "P9_38" # AIN that the battery is connected to.
 BatteryVoltage = 12 # Nominal battery voltage. Largely used for single/multi cell LIons or LiPos.
+DepthUART = "UART2"
