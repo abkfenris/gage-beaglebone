@@ -17,7 +17,7 @@ ser.bytesize = serial.EIGHTBITS
 ser.parity = serial.PARITY_NONE
 ser.stopbits = serial.STOPBITS_ONE
 
-def checkDepth(depthAIN="P9_40",j=3):
+def checkDepth(j=3):
 
 	currentDepthList = [] # create an empty array to store the depth values
 	

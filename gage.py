@@ -8,5 +8,5 @@ import requests
 # import power
 
 print "DepthAIN is " + config.DepthAIN
-print "The depth in inches is " + str(round(ultrasound.checkDepth(config.DepthAIN,6), 2))
+print "The depth in inches is " + str(round(ultrasound.checkDepth(6), 2))
 print ""
