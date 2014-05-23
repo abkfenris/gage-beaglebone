@@ -21,5 +21,5 @@ def checkPower(j=3):
 		
 	#currentDepth = numpy.mean(currentDepthList)
 	
-	currentPower.append(ina.getBusVoltage_V()
-	return currentPower
+	currentPowerList.append(ina.getBusVoltage_V()
+	return currentPowerList
