@@ -8,18 +8,11 @@ ina = INA219()
 
 def checkPower(j=3):
 	
-	#currentPowerList = [] # create an empty array to store the power values
-
-	#for i in range(0,j):
-	#	ser.open()
-	#	ser.flushOutput()
-	#	ser.flushInput()
-	#	currentDepthList.append(int(ser.read(5)[1:4]))
-	#	ser.close()
+	currentPowerList = [] # create an empty array to store the power values
 	
-	#	time.sleep(.5) # Take a half second between reading ranges
+	for i in range(0,j):
+		currentPowerList.append(ina.getBusVoltage_V())
+		time.sleep(.5) # Take a half second between reading ranges
 		
-	#currentDepth = numpy.mean(currentDepthList)
-	
-	currentPower = ina.getBusVoltage_V()
+	currentPower = numpy.mean(currentPowerList)
 	return currentPower
