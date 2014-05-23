@@ -1,17 +1,7 @@
 #!/usr/bin/python
 # import Adafruit_BBIO.ADC as ADC
 import time
-import numpy
+import ina.Subfact_ina219 as INA219
 
 # ADC.setup()
 
-def checkPower(powerAIN="P9_36"):
-	currentPower = ADC.read(powerAIN)*18
-	return currentPower
-	
-	
-def powerCheckTrue():
-	return "True"
-	
-def powerCheckMath(powerAIN="P9_36"):
-	return "12.4"
