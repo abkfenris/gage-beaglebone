@@ -6,7 +6,7 @@ import ultrasound
 # import ephem
 from requests import post
 import datetime
-# import power
+import power
 
 # print "DepthAIN is " + config.DepthAIN
 # print "The depth in cm is " + str(round(ultrasound.checkDepth(6), 2))
@@ -14,6 +14,6 @@ import datetime
 
 level = ultrasound.checkDepth()
 timestamp = datetime.datetime.now()
-battery = 4.0
+battery = power.checkPower()
 payload = {'level': level, 'battery': battery, 'timestamp': timestamp}
 sample = post(config.PostURL, data=payload)
