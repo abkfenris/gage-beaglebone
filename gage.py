@@ -20,6 +20,7 @@ def send_results():
 	battery = power.checkPower()
 	payload = {'level': level, 'battery': battery, 'timestamp': timestamp}
 	sample = post(config.PostURL, data=payload)
+	print timestamp, battery, level
 	return True
 
 while True:
