@@ -29,7 +29,10 @@ def checkDepth(j=3):
 		ser.open()
 		ser.flushOutput()
 		ser.flushInput()
-		currentDepthList.append(int(ser.read(5)[1:4]))
+		try:
+			currentDepthList.append(int(ser.read(5)[1:4]))
+		except ValueError:
+			ser.flushInput()
 		ser.close()
 
 		time.sleep(.5) # Take a half second between reading ranges
