@@ -7,13 +7,21 @@ import ultrasound
 from requests import post
 import datetime
 import power
+import time
 
 # print "DepthAIN is " + config.DepthAIN
 # print "The depth in cm is " + str(round(ultrasound.checkDepth(6), 2))
 # print ""
 
-level = ultrasound.checkDepth()
-timestamp = datetime.datetime.now()
-battery = power.checkPower()
-payload = {'level': level, 'battery': battery, 'timestamp': timestamp}
-sample = post(config.PostURL, data=payload)
+
+def send_results():
+	level = ultrasound.checkDepth()
+	timestamp = datetime.datetime.now()
+	battery = power.checkPower()
+	payload = {'level': level, 'battery': battery, 'timestamp': timestamp}
+	sample = post(config.PostURL, data=payload)
+	return True
+
+while True:
+	send_results()
+	time.sleep(60)
