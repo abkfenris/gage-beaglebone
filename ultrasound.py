@@ -8,7 +8,7 @@ import config
 
 UART.setup(config.DepthUART)
 
-GPIO.setup(config.DepthGPIO, GPIO.OUT)
+#GPIO.setup(config.DepthGPIO, GPIO.OUT)
 
 ser = serial.Serial()
 ser.port = config.SerialDev
@@ -21,7 +21,7 @@ def checkDepth(j=3):
 
 	currentDepthList = [] # create an empty array to store the depth values
 	
-	GPIO.output(config.DepthGPIO, GPIO.HIGH) # use GPIO to Pin 4 on Ultrasonic sensor to turn ranging on and off (and therefore save power)
+	#GPIO.output(config.DepthGPIO, GPIO.HIGH) # use GPIO to Pin 4 on Ultrasonic sensor to turn ranging on and off (and therefore save power)
 	
 	time.sleep(.5) # give time for the sensor to wake up and start 
 	
@@ -34,7 +34,7 @@ def checkDepth(j=3):
 
 		time.sleep(.5) # Take a half second between reading ranges
 		
-	GPIO.output(config.DepthGPIO, GPIO.LOW)
+	#GPIO.output(config.DepthGPIO, GPIO.LOW)
 	currentDepth = numpy.mean(currentDepthList)
 	return currentDepth
 
