@@ -33,7 +33,7 @@ if __name__ == '__main__':
 		while True:
 			send_results()
 			time.sleep(60)
-			os.system("poweroff")
+			os.system("shutdown -h now")
 	else:
 		print 'gagestop is in /boot/uboot/ or gagerun is not.'
 else:
