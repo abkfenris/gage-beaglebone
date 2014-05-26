@@ -10,6 +10,7 @@ import datetime
 import power
 import time
 import os.path
+import os.system
 
 # print "DepthAIN is " + config.DepthAIN
 # print "The depth in cm is " + str(round(ultrasound.checkDepth(6), 2))
@@ -27,11 +28,12 @@ def send_results():
 
 
 if __name__ == '__main__':
-	if os.path.isfile("/boot/uboot/gagerun") and not os.path.isfile("/boot/uboot/gagestop"):		
+	if os.path.isfile("/boot/uboot/gagerun") and not os.path.isfile("/boot/uboot/gagestop"):
+		print 'This program is running as __main__.'		
 		while True:
-			print 'This program is running as __main__.'
 			send_results()
 			time.sleep(60)
+			os.system("poweroff")
 	else:
 		print 'gagestop is in /boot/uboot/ or gagerun is not.'
 else:
