@@ -10,7 +10,7 @@ import datetime
 import power
 import time
 import os.path
-import os.system
+import os
 
 # print "DepthAIN is " + config.DepthAIN
 # print "The depth in cm is " + str(round(ultrasound.checkDepth(6), 2))
