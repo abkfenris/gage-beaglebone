@@ -16,7 +16,7 @@ import time
 
 def send_results():
 	level = ultrasound.checkDepth()
-	timestamp = datetime.datetime.now()
+	timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 	battery = power.checkPower()
 	payload = {'level': level, 'battery': battery, 'timestamp': timestamp}
 	sample = post(config.PostURL, data=payload)
