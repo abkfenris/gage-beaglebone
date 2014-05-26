@@ -16,13 +16,18 @@ import time
 
 def send_results():
 	level = ultrasound.checkDepth()
-	timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+	timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") # remove the microsecond http://stackoverflow.com/questions/7999935/python-datetime-to-string-without-microsecond-component
 	battery = power.checkPower()
 	payload = {'level': level, 'battery': battery, 'timestamp': timestamp}
 	sample = post(config.PostURL, data=payload)
 	print timestamp, battery, level
 	return True
 
-while True:
-	send_results()
-	time.sleep(60)
+
+if __name__ == '__main__':
+	while True:
+		print 'This program is running as __main__.'
+		send_results()
+		time.sleep(60)
+	else:
+		print 'gage.py is imported'
