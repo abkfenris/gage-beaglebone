@@ -18,9 +18,9 @@ import os
 
 
 
-def send_results():
+def send_results(destination):
 	level = ultrasound.checkDepth()
-	timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") # remove the microsecond http://stackoverflow.com/questions/7999935/python-datetime-to-string-without-microsecond-component
+	timestamp = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S") # remove the microsecond http://stackoverflow.com/questions/7999935/python-datetime-to-string-without-microsecond-component
 	battery = power.checkPower()
 	payload = {'level': level, 'battery': battery, 'timestamp': timestamp}
 	try:
@@ -39,7 +39,7 @@ if __name__ == '__main__':
 	if os.path.isfile("/boot/uboot/gagerun") and not os.path.isfile("/boot/uboot/gagestop"):
 		print 'This program is running as __main__.'		
 		while True:
-			send_results()
+			send_results(config.PostURL)
 			time.sleep(60)
 			os.system("shutdown -h now")
 	else:
