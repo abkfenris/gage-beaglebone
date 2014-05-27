@@ -17,12 +17,16 @@ import os
 # print ""
 
 
+
 def send_results():
 	level = ultrasound.checkDepth()
 	timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") # remove the microsecond http://stackoverflow.com/questions/7999935/python-datetime-to-string-without-microsecond-component
 	battery = power.checkPower()
 	payload = {'level': level, 'battery': battery, 'timestamp': timestamp}
-	sample = post(config.PostURL, data=payload, auth=(config.Id, config.Password))
+	try:
+		sample = post(config.PostURL, data=payload, auth=(config.Id, config.Password))
+	with open('status.txt', 'a') as the_file:
+		the_file.write(str(payload))
 	print timestamp, battery, level
 	return True
 
