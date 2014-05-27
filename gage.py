@@ -26,10 +26,11 @@ def send_results():
 	try:
 		sample = post(config.PostURL, data=payload, auth=(config.Id, config.Password))
 	except Exception as detail:
-		with open('status.txt', 'a') as the_file:
+		with open('status.txt', 'ab') as the_file:
 			the_file.write(str(detail))
-	with open('status.txt', 'a') as the_file:
+	with open('status.txt', 'ab') as the_file:
 		the_file.write(str(payload))
+		the_file.write('\n')
 	print timestamp, battery, level
 	return True
 
