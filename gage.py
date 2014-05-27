@@ -41,7 +41,8 @@ if __name__ == '__main__':
 		while True:
 			send_results(config.PostURL)
 			time.sleep(60)
-			os.system("shutdown -h now")
+			if not os.path.isfile("/boot/uboot/gagestop"):
+				os.system("shutdown -h now")
 	else:
 		print 'gagestop is in /boot/uboot/ or gagerun is not.'
 else:
