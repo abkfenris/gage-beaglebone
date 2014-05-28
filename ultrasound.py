@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import Adafruit_BBIO.GPIO as GPIO
 import Adafruit_BBIO.UART as UART
-import serial
+import serial # aka pyserial
 import time
 import numpy
 import config

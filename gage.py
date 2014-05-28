@@ -39,8 +39,8 @@ if __name__ == '__main__':
 	if os.path.isfile("/boot/uboot/gagerun") and not os.path.isfile("/boot/uboot/gagestop"):
 		print 'This program is running as __main__.'		
 		while True:
-			send_results(config.PostURL)
 			time.sleep(60)
+			send_results(config.PostURL)
 			if not os.path.isfile("/boot/uboot/gagestop"):
 				os.system("shutdown -h now")
 	else:
