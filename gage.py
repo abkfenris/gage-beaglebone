@@ -26,7 +26,7 @@ class Sample(BaseModel):
 	volts = FloatField()
 	amps = FloatField()
 	uploaded = BooleanField()
-	result = CharField(null=True)
+	result = TextField(null=True)
 	server_sample_id = IntegerField(null=True)
 
 class Config(BaseModel):
