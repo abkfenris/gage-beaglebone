@@ -48,7 +48,7 @@ def send_samples(destination=config.PostURL,id=config.Id,password=config.Passwor
 		try:
 			submit_sample = post(destination, data=payload, auth=(id, password), timeout=10)
 			if submit_sample.status_code == 201:
-				sample.uploaded = true
+				sample.uploaded = True
 				sample.result = submit_sample.json()
 				sample.save()
 				with open('/boot/uboot/gage-status.txt', 'ab') as status_file:
