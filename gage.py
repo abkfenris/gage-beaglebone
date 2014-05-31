@@ -66,6 +66,8 @@ def send_samples(destination=config.PostURL,id=config.Id,password=config.Passwor
 					sample.server_sample_id = data['server_sample_id']
 				except:
 					pass
+				if data['Access'] == True:
+					open('/boot/uboot/gagestop', 'a').close()
 				sample.save()
 				with open('/boot/uboot/gage-status.txt', 'ab') as status_file:
 					status_file.write('Sample uploaded at ')
