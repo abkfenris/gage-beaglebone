@@ -1,5 +1,7 @@
 [Unit]
 Description=Ultrasonic gage client
+Wants=rtc-ds1307.service
+After=rtc-ds1307.service
 
 [Service]
 WorkingDirectory=/gage/gage-beaglebone/
