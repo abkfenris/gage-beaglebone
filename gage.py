@@ -66,7 +66,7 @@ def send_samples(destination=config.PostURL,id=config.Id,password=config.Passwor
 					status_file.write('Sample uploaded at ')
 					status_file.write(str(datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")))
 					status_file.write(' ')
-					status_file.write(submit_sample.json())
+					status_file.write(str(submit_sample.json()))
 					status_file.write(' ')
 		with open('/boot/uboot/gage-status.txt', 'ab') as status_file:
 			status_file.write(str(payload))
