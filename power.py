@@ -33,7 +33,7 @@ def checkAmps(j=3):
 	currentAmpsList = [] # create an empty array to store the amprage values
 	
 	for i in range(0,j):
-		currentAmpssList.append(ina.getCurrent_mA())
+		currentAmpsList.append(ina.getCurrent_mA())
 		time.sleep(.5)
 	
 	currentAmps = numpy.mean(currentAmpsList)

@@ -33,7 +33,7 @@ class Config(BaseModel):
 	timing = IntegerField()
 	url = CharField()
 
-def get_results():
+def get_sample():
 	level = ultrasound.checkDepth()
 	timestamp = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S") # remove the microsecond http://stackoverflow.com/questions/7999935/python-datetime-to-string-without-microsecond-component
 	volts = power.checkVolts()
@@ -42,7 +42,7 @@ def get_results():
 
 
 
-def send_results(destination,id,password):
+def send_samples(destination,id,password):
 	for sample in Sample.select().where(Sample.uploaded == False).order_by(Sample.timestamp.asc()):
 		payload = {'level': sample.level, 'battery': sample.volts, 'timestamp': sample.timestamp}
 		try:
@@ -90,9 +90,9 @@ if __name__ == '__main__':
 	if os.path.isfile("/boot/uboot/gagerun") and not os.path.isfile("/boot/uboot/gagestop"):
 		print 'This program is running as __main__.'		
 		while True:
-			get_results()
+			get_sample()
 			time.sleep(60)
-			send_results(config.PostURL)
+			send_samples(config.PostURL)
 			if not os.path.isfile("/boot/uboot/gagestop"):
 				os.system("shutdown -h now")
 	else:
