@@ -50,7 +50,8 @@ def send_samples(destination,id,password):
 			if submit_sample.status_code == 201:
 				sample.uploaded = true
 				sample.result = submit_sample.json()
-				with open('/boot/uboot/status.txt', 'ab') as status_file:
+				sample.save()
+				with open('/boot/uboot/gage-status.txt', 'ab') as status_file:
 					status_file.write('Sample uploaded at ')
 					status_file.write(str(datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")))
 					status_file.write(' ')
@@ -59,11 +60,14 @@ def send_samples(destination,id,password):
 		except Exception as detail:
 			sample.result = detail
 			sample.uploaded = False
-			with open('/boot/uboot/status.txt', 'ab') as status_file:
+			sample.save()
+			with open('/boot/uboot/gage-status.txt', 'ab') as status_file:
 				status_file.write('Failed upload at ')
+				status_file.write(str(datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")))
+				status_file.write(' ')
 				status_file.write(str(detail))
 				status_file.write(' ')
-		with open('/boot/uboot/status.txt', 'ab') as status_file:
+		with open('/boot/uboot/gage-status.txt', 'ab') as status_file:
 			status_file.write(str(payload))
 			status_file.write('\n')
 		return True
