@@ -70,7 +70,7 @@ def send_samples(destination,id,password):
 		with open('/boot/uboot/gage-status.txt', 'ab') as status_file:
 			status_file.write(str(payload))
 			status_file.write('\n')
-		return True
+	return True
 		
 
 
