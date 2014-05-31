@@ -56,7 +56,7 @@ def send_results(destination,id,password):
 					status_file.write(' ')
 					status_file.write(submit_sample.json())
 					status_file.write(' ')
-		with Exception as detail:
+		except Exception as detail:
 			sample.result = detail
 			sample.uploaded = False
 			with open('/boot/uboot/status.txt', 'ab') as status_file:
