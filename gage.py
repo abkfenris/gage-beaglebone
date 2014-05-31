@@ -66,7 +66,7 @@ def send_samples(destination=config.PostURL,id=config.Id,password=config.Passwor
 					sample.server_sample_id = data['server_sample_id']
 				except:
 					pass
-				if 'access' in data:
+				if 'Access' in data:
 					with open('/boot/uboot/gagestop', 'a') as stop_file:
 						stop_file.write('Stopped at ')
 						stop_file.write(str(datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")))
