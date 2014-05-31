@@ -42,7 +42,7 @@ def get_sample():
 
 
 
-def send_samples(destination,id,password):
+def send_samples(destination=config.PostURL,id=config.Id,password=config.Password):
 	for sample in Sample.select().where(Sample.uploaded == False).order_by(Sample.timestamp.asc()):
 		payload = {'level': sample.level, 'battery': sample.volts, 'timestamp': sample.timestamp}
 		try:
@@ -96,7 +96,7 @@ if __name__ == '__main__':
 		while True:
 			get_sample()
 			time.sleep(60)
-			send_samples(config.PostURL)
+			send_samples()
 			if not os.path.isfile("/boot/uboot/gagestop"):
 				os.system("shutdown -h now")
 	else:
