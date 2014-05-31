@@ -44,19 +44,9 @@ def get_sample():
 
 def send_samples(destination=config.PostURL,id=config.Id,password=config.Password):
 	for sample in Sample.select().where(Sample.uploaded == False).order_by(Sample.timestamp.asc()):
-		payload = {'level': sample.level, 'battery': sample.volts, 'timestamp': sample.timestamp}
+		payload = {'level': sample.level, 'battery': sample.volts, 'timestamp': str(sample.timestamp)}
 		try:
-			submit_sample = post(destination, data=payload, auth=(id, password), timeout=10)
-			if submit_sample.status_code == 201:
-				sample.uploaded = True
-				sample.result = submit_sample.json()
-				sample.save()
-				with open('/boot/uboot/gage-status.txt', 'ab') as status_file:
-					status_file.write('Sample uploaded at ')
-					status_file.write(str(datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")))
-					status_file.write(' ')
-					status_file.write(submit_sample.json())
-					status_file.write(' ')
+			submit_sample = post(config.PostURL, data=payload, auth=(config.Id, config.Password), timeout=10)
 		except Exception as detail:
 			sample.result = detail
 			sample.uploaded = False
@@ -67,6 +57,17 @@ def send_samples(destination=config.PostURL,id=config.Id,password=config.Passwor
 				status_file.write(' ')
 				status_file.write(str(detail))
 				status_file.write(' ')
+		else:
+			if submit_sample.status_code == 201:
+				sample.uploaded = True
+				sample.result = submit_sample.json()
+				sample.save()
+				with open('/boot/uboot/gage-status.txt', 'ab') as status_file:
+					status_file.write('Sample uploaded at ')
+					status_file.write(str(datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")))
+					status_file.write(' ')
+					status_file.write(submit_sample.json())
+					status_file.write(' ')
 		with open('/boot/uboot/gage-status.txt', 'ab') as status_file:
 			status_file.write(str(payload))
 			status_file.write('\n')
