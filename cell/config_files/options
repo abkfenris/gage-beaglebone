@@ -1,0 +1,6 @@
+logfile /var/log/ppp/log
+noaccomp
+nopcomp
+nocrtscts
+lock
+maxfail 0

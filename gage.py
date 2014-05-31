@@ -11,10 +11,29 @@ import power
 import time
 import os.path
 import os
+from peewee import *
 
-# print "DepthAIN is " + config.DepthAIN
-# print "The depth in cm is " + str(round(ultrasound.checkDepth(6), 2))
-# print ""
+db = SqliteDatabase('/boot/uboot/gage.db')
+
+class BaseModel(Model):
+	class Meta:
+		database = db
+
+
+class Sample(BaseModel):
+	timestamp = DateTimeField()
+	level = FloatField()
+	volts = FloatField()
+	amps = FloatField()
+	uploaded = BooleanField()
+	result = CharField()
+	serverID = IntegerField()
+
+class Config(BaseModel):
+	timing = IntegerField()
+	url = CharField()
+	
+	
 
 
 
