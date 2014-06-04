@@ -47,6 +47,7 @@ def send_samples(destination=config.PostURL,id=config.Id,password=config.Passwor
 		payload = {'level': sample.level, 'battery': sample.volts, 'timestamp': str(sample.timestamp)}
 		try:
 			submit_sample = post(config.PostURL, data=payload, auth=(config.Id, config.Password), timeout=10)
+			submit_sample2 = post(config.PostURL2, data=payload, auth=(config.Id, config.Password), timeout=10)
 		except Exception as detail:
 			sample.result = detail
 			sample.uploaded = False
