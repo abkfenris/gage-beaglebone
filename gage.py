@@ -8,7 +8,7 @@ from requests import post
 from requests.auth import HTTPBasicAuth
 import datetime
 import power
-import pcape
+#import pcape
 import time
 import os.path
 import os
@@ -107,7 +107,7 @@ if __name__ == '__main__':
 		while True:
 			time.sleep(45)
 			get_sample()
-			pcape.setTime(2)
+			#pcape.setTime(2)
 			time.sleep(15)
 			send_samples()
 			if not os.path.isfile("/boot/uboot/gagestop"):
