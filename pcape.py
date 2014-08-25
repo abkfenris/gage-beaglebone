@@ -9,5 +9,4 @@ def setTime(cycleTime):
 	try:
 		powercapeI2C.write8(7, cycleTime)
 	except Exception, e:
-		with open('/boot/uboot/gage-status.txt', 'ab') as status_file:
-					status_file.write(str(e))
+		pass

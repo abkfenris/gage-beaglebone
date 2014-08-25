@@ -107,7 +107,7 @@ if __name__ == '__main__':
 		while True:
 			time.sleep(45)
 			get_sample()
-			pcape.setTime(config.CycleTime)
+			pcape.setTime(2)
 			time.sleep(15)
 			send_samples()
 			if not os.path.isfile("/boot/uboot/gagestop"):
