@@ -1,7 +1,7 @@
 import config
 from Adafruit_I2C import Adafruit_I2C
 
-cycleTime = config.CycleTime
+#cycleTime = config.CycleTime
 
 powercapeI2C = Adafruit_I2C(0x21)
 
