@@ -2,9 +2,11 @@
 Fabric commands to setup beaglebone
 """
 from fabric.api import cd, env, lcd, put, prompt, local, sudo, prefix
-from fabric.contrib.files import exists
+from fabric.decorators import runs_once
+from fabric.contrib.files import exists, sed
 from fabric.contrib.console import confirm
 from fabtools import require
+import fabtools
 
 try:
     from fabhosts import bone
@@ -47,7 +49,7 @@ def apt_upgrade():
     sudo('apt-get upgrade')
 
 
-def gage_folder():
+def mk_gage_folder():
     """
     Folder for gage to run from
     """
@@ -64,16 +66,26 @@ def git_gage():
         branch='master',
         update=True,
         use_sudo=True)
+    with cd(gage_folder+'/gage-beaglebone'):
+        # initialize and update the submodule
+        sudo('git submodule init')
+        sudo('git submodule update')
 
 
-def install_requirements():
+def python_requirements():
     """
-    Install required packages
+    Install required packages for python
     """
-    require.deb.package('python-smbus')
-    require.deb.package('python-numpy')
+    require.deb.packages(['python-smbus', 'python-numpy'])
     require.python.requirements(
         gage_folder+'/gage-beaglebone/gage-requirements.txt')
+
+
+def powercape_requirements():
+    """
+    Install requirements for powercape
+    """
+    require.deb.packages(['gcc-avr', 'avr-libc', 'avrdude'])
 
 
 def git_powercape():
@@ -98,10 +110,10 @@ def powercape_update_bootloader():
     http://andicelabs.com/2014/05/updating-power-cape-firmware/
     """
     with cd(gage_folder+'/powercape/utils'):
-        sudo('./powercape -b')
+        sudo('./power -b')
     with cd(gage_folder+'/powercape/avr/twiboot/linux'):
-        sudo('make')
-        sudo('./twiboot -a 0x20 -w flask:powercape.hex')
+        # sudo('make')
+        sudo('./twiboot -a 0x20 -w flash:powercape.hex')
 
 
 def powercape_rtc_set():
@@ -138,6 +150,45 @@ def clean_shutdown():
     """
     http://andicelabs.com/2014/07/automatic-root-filesystem-repair-boot/
     """
+    sed('/lib/init/vars.sh', 'FSCKFIX=no', 'FSCKFIX=yes', use_sudo=True)
+
+
+def shutdown():
+    """
+    Shut the beaglebone down
+    """
+    sudo('shutdown -h now')
+
+
+@runs_once
+def _settings():
+    """
+    Get settings
+    """
+    settings = {}
+    settings['name'] = prompt('Gage name?')
+    settings['id_num'] = prompt('Gage id number?')
+    settings['secret_key'] = prompt('Secret gage password?')
+    settings['depth_ain'] = prompt('Depth AIN?')
+    settings['depth_gpio'] = prompt('Depth GPIO?')
+    settings['depth_uart'] = prompt('Depth UART?')
+    settings['serial_dev'] = prompt('Serial Device?')
+    settings['url'] = prompt('API post URL?')
+    return settings
+
+
+def make_config():
+    """
+    Make config file and place on gage
+    """
+    settings = _settings()
+    fabtools.files.upload_template(
+        'templates/config.py',
+        '/gage/gage-beaglebone/config.py',
+        context=settings,
+        use_sudo=True,
+        use_jinja=True
+    )
 
 
 def bootstrap():
@@ -145,6 +196,9 @@ def bootstrap():
     Setup all the things to make gage-beaglebone work
     """
     apt_upgrade()
-    gage_folder()
+    clean_shutdown()
+    mk_gage_folder()
     git_gage()
+    python_requirements()
     git_powercape()
+    powercape_requirements()
