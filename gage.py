@@ -92,6 +92,7 @@ def send_samples(destination=config.PostURL,
             ))
 
     # for every id that was sent mark as uploaded
+    sucessful_ids = set(sucessful_ids)
     for sample_id in sucessful_ids:
         sample = Sample.get(Sample.id == sample_id)
         sample.uploaded = True

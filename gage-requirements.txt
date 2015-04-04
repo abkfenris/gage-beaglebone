@@ -1,0 +1,4 @@
+Adafruit_BBIO
+requests
+pyserial
+peewee
