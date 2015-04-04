@@ -1,0 +1,3 @@
+[submodule "gage_client"]
+	path = gage_client
+	url = https://github.com/abkfenris/gage-client.git
