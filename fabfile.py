@@ -120,9 +120,9 @@ def powercape_rtc_set():
     """
     Set the time on the powercape rtc
     """
-    sudo('timedatectl')
-    sudo('/usr/bin/ntpdate -b -s -u pool.ntp.org')
-    sudo('timedatectl')
+    sudo('date')
+    sudo('ntpdate -b -s -u pool.ntp.org')
+    sudo('date')
     with cd(gage_folder+'/powercape/utils'):
         sudo('./powercape -w')
 
