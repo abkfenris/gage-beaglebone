@@ -76,7 +76,7 @@ def python_requirements():
     """
     Install required packages for python
     """
-    require.deb.packages(['python-smbus', 'python-numpy'])
+    require.deb.packages(['python-smbus', 'python-numpy', 'minicom'])
     require.python.requirements(
         gage_folder+'/gage-beaglebone/gage-requirements.txt')
 

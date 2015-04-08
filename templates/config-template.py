@@ -1,8 +1,8 @@
-Name = {{ name }} # Friendly name for the gage
-Id = {{ id_num }} # Gage ID number on server, check with server admin for an ID
-Password = {{ secret_key }} # Password for luggage/uploading data to server for this gage
-DepthAIN = {{ depth_ain }} # AIN that the ultrasonic sensor for depth is connected to
-DepthGPIO = {{ depth_gpio }}
-DepthUART = {{ uart }}
-SerialDev = {{ serial_dev }}
-PostURL = {{ url }}
+Name = '{{ name }}'  # Friendly name for the gage
+Id = '{{ id_num }}'  # Gage ID number on server
+Password = '{{ secret_key }}'  # Password for uploading data to server
+DepthAIN = '{{ depth_ain }}'  # AIN that the ultrasonic sensor
+DepthGPIO = '{{ depth_gpio }}'  # GPIO for ultrasonic sensor
+DepthUART = '{{ uart }}'  # UART for ultrasonic sensor
+SerialDev = '{{ serial_dev }}'  # TTY for ultrasonic sensor
+PostURL = '{{ url }}'  # URL for server API endpoint

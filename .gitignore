@@ -1,3 +1,4 @@
 /config.py
 *.pyc
 fabhosts.py
+docs/_build
