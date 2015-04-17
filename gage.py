@@ -1,19 +1,20 @@
 #!/usr/bin/python
 
-# import gage_config
-import config
-import ultrasound
-# import ephem
-from requests import post
 import datetime
-import power
-import pcape
 import time
 import os.path
 import os
+
 from peewee import *
 
 from gage_client.gage_client.client import Client, SendError
+
+import ultrasound
+import power
+# import pcape
+
+import config
+
 
 db = SqliteDatabase('/boot/uboot/gage.db')
 
@@ -105,7 +106,7 @@ if __name__ == '__main__':
         while True:
             time.sleep(45)
             get_sample()
-            pcape.setTime(config.CycleTime)
+            # pcape.setTime(config.CycleTime)
             time.sleep(15)
             send_samples()
             if not os.path.isfile("/boot/uboot/gagestop"):
