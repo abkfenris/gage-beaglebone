@@ -103,9 +103,9 @@ if __name__ == '__main__':
     if os.path.isfile("/boot/uboot/gagerun") and not os.path.isfile("/boot/uboot/gagestop"):
         print 'This program is running as __main__.'
         while True:
+            os.system('/gage/powercape/utils/power -s')
             time.sleep(45)
             get_sample()
-            # pcape.setTime(config.CycleTime)
             time.sleep(15)
             send_samples()
             if not os.path.isfile("/boot/uboot/gagestop"):

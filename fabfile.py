@@ -85,7 +85,7 @@ def powercape_requirements():
     """
     Install requirements for powercape
     """
-    require.deb.packages(['gcc-avr', 'avr-libc', 'avrdude'])
+    require.deb.packages(['gcc-avr', 'avr-libc', 'avrdude', 'unzip'])
 
 
 def git_powercape():
@@ -109,11 +109,17 @@ def powercape_update_bootloader():
 
     http://andicelabs.com/2014/05/updating-power-cape-firmware/
     """
+    with cd('/gage'):
+        sudo('wget http://andicelabs.com/wp-content/uploads/2014/08/powercape.zip')
+        sudo('unzip powercape.zip')
     with cd(gage_folder+'/powercape/utils'):
         sudo('./power -b')
     with cd(gage_folder+'/powercape/avr/twiboot/linux'):
         # sudo('make')
-        sudo('./twiboot -a 0x20 -w flash:powercape.hex')
+        sudo('./twiboot -a 0x20 -w flash:/gage/powercape.hex')
+    with cd('/gage'):
+        sudo('rm powercape.hex')
+        sudo('rm powercape.zip')
 
 
 def powercape_rtc_set():
