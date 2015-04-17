@@ -197,6 +197,24 @@ def make_config():
     )
 
 
+def add_service():
+    """
+    Add the systemd service
+    """
+    with cd('/lib/systemd/system'):
+        require.file('gage-logger.service',
+                     source='gage-logger.service',
+                     use_sudo=True)
+        sudo('systemctl enable gage-logger.service')
+
+
+def gagerun():
+    """
+    Add gagerun to uboot so that it will go do it's thing
+    """
+    sudo('touch /boot/uboot/gagerun')
+
+
 def bootstrap():
     """
     Setup all the things to make gage-beaglebone work
@@ -208,3 +226,6 @@ def bootstrap():
     python_requirements()
     git_powercape()
     powercape_requirements()
+    powercape_startup_set()
+    add_service()
+    gagerun()

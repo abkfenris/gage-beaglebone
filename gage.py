@@ -76,27 +76,29 @@ def send_samples(destination=config.PostURL,
             status_file.write('  sucess fully uploaded: {success}'.format(
                 success=sucessful_ids
             ))
-    except SendError as e:
-        sucessful_ids = e.sucessful
-        with open('/boot/uboot/gage-status.txt', 'ab') as status_file:
-            status_file.write('Send error at {dt} to {url}, {detail}'.format(
-                dt=datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
-                url=destination,
-                detail=e
-            ))
-            status_file.write('  failed to upload: {failed}'.format(
-                failed=e.fail
-            ))
-            status_file.write('  sucess fully uploaded: {success}'.format(
-                success=e.sucessful
-            ))
-
+    except:
+        pass
+        #sucessful_ids = e.sucessful
+        #with open('/boot/uboot/gage-status.txt', 'ab') as status_file:
+        #    status_file.write('Send error at {dt} to {url}, {detail}'.format(
+        #        dt=datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+        #        url=destination,
+        #        detail=e
+        #    ))
+        #    status_file.write('  failed to upload: {failed}'.format(
+        #        failed=e.fail
+        #    ))
+        #    status_file.write('  sucess fully uploaded: {success}'.format(
+        #        success=e.sucessful
+        #    ))
+#
     # for every id that was sent mark as uploaded
-    sucessful_ids = set(sucessful_ids)
-    for sample_id in sucessful_ids:
-        sample = Sample.get(Sample.id == sample_id)
-        sample.uploaded = True
-        sample.save()
+    else:
+        sucessful_ids = set(sucessful_ids)
+        for sample_id in sucessful_ids:
+            sample = Sample.get(Sample.id == sample_id)
+            sample.uploaded = True
+            sample.save()
 
 
 if __name__ == '__main__':
