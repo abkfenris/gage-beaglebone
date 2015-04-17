@@ -61,9 +61,9 @@ def send_samples(destination=config.PostURL,
 
     # get samples that need to be sent and add to readings queue
     for sample in Sample.select().where(Sample.uploaded == False):
-        client.reading('level', str(sample.timestamp), sample.level)
-        client.reading('volts', str(sample.timestamp), sample.volts)
-        client.reading('amps', str(sample.timestamp), sample.amps)
+        client.reading('level', str(sample.timestamp), sample.level, id=sample.id)
+        client.reading('volts', str(sample.timestamp), sample.volts, id=sample.id)
+        client.reading('amps', str(sample.timestamp), sample.amps, id=sample.id)
 
     # try to send and write result to status file
     try:
