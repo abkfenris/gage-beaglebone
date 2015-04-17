@@ -60,7 +60,7 @@ def send_samples(destination=config.PostURL,
     client = Client(destination, id, password)
 
     # get samples that need to be sent and add to readings queue
-    for sample in Sample.select().where(Sample.uploaded is False):
+    for sample in Sample.select().where(Sample.uploaded == False):
         client.reading('level', str(sample.timestamp), sample.level)
         client.reading('volts', str(sample.timestamp), sample.volts)
         client.reading('amps', str(sample.timestamp), sample.amps)
@@ -73,7 +73,7 @@ def send_samples(destination=config.PostURL,
                 dt=datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
                 url=destination,
             ))
-            status_file.write('  sucess fully uploaded: {sucess}'.format(
+            status_file.write('  sucess fully uploaded: {success}'.format(
                 success=sucessful_ids
             ))
     except SendError as e:
@@ -87,7 +87,7 @@ def send_samples(destination=config.PostURL,
             status_file.write('  failed to upload: {failed}'.format(
                 failed=e.fail
             ))
-            status_file.write('  sucess fully uploaded: {sucess}'.format(
+            status_file.write('  sucess fully uploaded: {success}'.format(
                 success=e.sucessful
             ))
 
