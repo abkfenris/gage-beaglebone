@@ -60,8 +60,7 @@ def send_samples(destination=config.PostURL,
     client = Client(destination, id, password)
 
     # get samples that need to be sent and add to readings queue
-    for sample in Sample.select().where(Sample.uploaded is False).order_by(
-            Sample.timestamp.asc()):
+    for sample in Sample.select().where(Sample.uploaded is False):
         client.reading('level', str(sample.timestamp), sample.level)
         client.reading('volts', str(sample.timestamp), sample.volts)
         client.reading('amps', str(sample.timestamp), sample.amps)
