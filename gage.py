@@ -18,7 +18,6 @@ from gage_client.gage_client.client import Client, SendError
 
 import ultrasound
 import power
-# import pcape
 
 import config
 
@@ -84,13 +83,13 @@ def send_samples(destination=config.PostURL,
                 success=sucessful_ids
             ))
     except Exception as e:
-        #sucessful_ids = e.sucessful
+        # sucessful_ids = e.sucessful
         with open('/boot/uboot/gage-status.txt', 'ab') as status_file:
             status_file.write('Send error at {dt} to {url}, {detail}'.format(
                 dt=datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
                 url=destination,
                 detail=e
-        #    ))
+            ))
         #    status_file.write('  failed to upload: {failed}'.format(
         #        failed=e.fail
         #    ))
