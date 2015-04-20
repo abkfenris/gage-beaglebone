@@ -84,7 +84,6 @@ def send_samples(destination=config.PostURL,
                 success=sucessful_ids
             ))
     except Exception as e:
-        pass
         #sucessful_ids = e.sucessful
         with open('/boot/uboot/gage-status.txt', 'ab') as status_file:
             status_file.write('Send error at {dt} to {url}, {detail}'.format(

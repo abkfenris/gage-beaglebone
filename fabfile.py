@@ -258,5 +258,5 @@ def bootstrap():
     git_powercape()
     powercape_requirements()
     powercape_startup_set()
-    add_service()
+    service_add()
     gagerun()
