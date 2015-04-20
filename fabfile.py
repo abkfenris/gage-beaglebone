@@ -60,6 +60,7 @@ def git_gage():
     """
     Clone or update the gage-beaglebone repo
     """
+    sudo('systemctl stop gage-logger.service')
     require.git.working_copy(
         'https://github.com/abkfenris/gage-beaglebone.git',
         path=gage_folder+'/gage-beaglebone',
@@ -197,7 +198,7 @@ def make_config():
     )
 
 
-def add_service():
+def service_add():
     """
     Add the systemd service
     """
@@ -208,11 +209,41 @@ def add_service():
         sudo('systemctl enable gage-logger.service')
 
 
+def service_start():
+    """
+    Start the service
+    """
+    sudo('systemctl start gage-logger.service')
+
+
 def gagerun():
     """
     Add gagerun to uboot so that it will go do it's thing
     """
     sudo('touch /boot/uboot/gagerun')
+
+
+def cell_sprint_sierra_250u():
+    """
+    Place configuration files for a Sprint Sierra 250 U modem
+    """
+    with lcd('cell/sprint/sierra250u/config-files'):
+        with cd('/etc'):
+            require.file('open.resolv.conf',
+                         source='open.resolv.conf',
+                         use_sudo=True)
+            with cd('ppp'):
+                sudo('cp options options.origional')
+                require.file('options',
+                             source='options',
+                             use_sudo=True)
+                require.file('ip-up',
+                             source='options',
+                             use_sudo=True)
+                with cd('peers'):
+                    require.file('gprs-connect-chat',
+                                 source='gprs-connect-chat',
+                                 use_sudo=True)
 
 
 def bootstrap():
@@ -227,5 +258,5 @@ def bootstrap():
     git_powercape()
     powercape_requirements()
     powercape_startup_set()
-    add_service()
+    service_add()
     gagerun()
