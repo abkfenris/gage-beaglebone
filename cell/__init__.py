@@ -28,10 +28,10 @@ class SprintSierra250U(CellConnection):
 
     def __enter__(self):
         # find the usb device for the cell modem
-        os.system(GAGE_DIR+'/cell/usb_discover.sh')
+        os.system(GAGE_DIR+'/cell/sprint/sierra250u/usb_discover.sh')
 
         # join the wireless network
-        os.system(GAGE_DIR+'/cell/join_network.sh')
+        os.system(GAGE_DIR+'/cell/sprint/sierra250u/join_network.sh')
 
     def __exit__(self, exc_type, exc_value, traceback):
         # Try to turn off ppp

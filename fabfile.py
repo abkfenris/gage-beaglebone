@@ -227,7 +227,7 @@ def cell_sprint_sierra_250u():
     """
     Place configuration files for a Sprint Sierra 250 U modem
     """
-    with lcd('cell/config-files'):
+    with lcd('cell/sprint/sierra250u/config-files'):
         with cd('/etc'):
             require.file('open.resolv.conf',
                          source='open.resolv.conf',
