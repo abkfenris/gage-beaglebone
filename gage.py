@@ -5,7 +5,14 @@ import time
 import os.path
 import os
 
-from peewee import *
+from peewee import (SqliteDatabase,
+                    Model,
+                    DateTimeField,
+                    FloatField,
+                    BooleanField,
+                    TextField,
+                    IntegerField,
+                    CharField)
 
 from gage_client.gage_client.client import Client, SendError
 
@@ -53,11 +60,11 @@ def get_sample():
 
 
 def send_samples(destination=config.PostURL,
-                 id=config.Id,
+                 gage_id=config.Id,
                  password=config.Password):
 
     # set up client
-    client = Client(destination, id, password)
+    client = Client(destination, gage_id, password)
 
     # get samples that need to be sent and add to readings queue
     for sample in Sample.select().where(Sample.uploaded == False):
@@ -76,14 +83,14 @@ def send_samples(destination=config.PostURL,
             status_file.write('  sucess fully uploaded: {success}'.format(
                 success=sucessful_ids
             ))
-    except:
+    except Exception as e:
         pass
         #sucessful_ids = e.sucessful
-        #with open('/boot/uboot/gage-status.txt', 'ab') as status_file:
-        #    status_file.write('Send error at {dt} to {url}, {detail}'.format(
-        #        dt=datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
-        #        url=destination,
-        #        detail=e
+        with open('/boot/uboot/gage-status.txt', 'ab') as status_file:
+            status_file.write('Send error at {dt} to {url}, {detail}'.format(
+                dt=datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+                url=destination,
+                detail=e
         #    ))
         #    status_file.write('  failed to upload: {failed}'.format(
         #        failed=e.fail
