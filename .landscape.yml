@@ -1,0 +1,4 @@
+ignore-paths:
+    - ina
+    - templates
+max-line-length: 120
