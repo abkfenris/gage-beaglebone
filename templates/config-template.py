@@ -9,3 +9,4 @@ PostURL = '{{ url }}'  # URL for server API endpoint
 RESTART_TIME = '{{ restart_time }}'  # Downtime between cycles
 LOG_PATH = '{{ log_path }}'  # path to log file
 CELL_TIMEOUT = {{ cell_timeout }}  # how many seconds to wait to timeout cell
+import {{ cell_import }} as Cell

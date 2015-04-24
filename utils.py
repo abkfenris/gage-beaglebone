@@ -8,7 +8,7 @@ class TimeoutError(Exception):
     pass
 
 
-class timeout(object):
+class Timeout(object):
 
     def __init__(self, seconds=1, error_message='Timeout'):
         self.seconds = seconds

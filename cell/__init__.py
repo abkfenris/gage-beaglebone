@@ -2,8 +2,6 @@
 Classes for cellular connections
 """
 
-GAGE_DIR = '/gage'
-
 
 class CellConnection(object):
     """

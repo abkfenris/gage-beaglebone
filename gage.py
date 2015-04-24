@@ -17,6 +17,7 @@ from peewee import (SqliteDatabase,
 from gage_client.gage_client.client import Client, SendError
 
 import ultrasound
+import pcape
 import power
 
 import config
@@ -106,17 +107,30 @@ def send_samples(destination=config.PostURL,
             sample.save()
 
 
+def check_time():
+    """
+    Compare current time to last time in database
+    """
+    sample = Sample.select().order_by(Sample.timestamp.desc()).get()
+    return datetime.datetime.utcnow() > sample.timestamp
+
+
 if __name__ == '__main__':
     if os.path.isfile("/boot/uboot/gagerun") and not os.path.isfile("/boot/uboot/gagestop"):
         print 'This program is running as __main__.'
-        while True:
-            os.system('/gage/powercape/utils/power -s')
-            time.sleep(45)
+        os.system('/gage/powercape/utils/power -s')
+        if check_time():
             get_sample()
-            time.sleep(15)
             send_samples()
-            if not os.path.isfile("/boot/uboot/gagestop"):
-                os.system("shutdown -h now")
+        else:
+            os.system('ntpdate -b -s -u pool.ntp.org')
+            os.system('/gage/powercape/util/power -w')
+            get_sample()
+            send_samples()
+        time.sleep(15)
+        if not os.path.isfile("/boot/uboot/gagestop"):
+            pcape.set_time(int(config.RESTART_TIME))
+            os.system("shutdown -h now")
     else:
         print 'gagestop is in /boot/uboot/ or gagerun is not.'
         exit()

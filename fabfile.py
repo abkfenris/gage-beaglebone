@@ -181,6 +181,19 @@ def _settings():
     settings['depth_uart'] = prompt('Depth UART?')
     settings['serial_dev'] = prompt('Serial Device?')
     settings['url'] = prompt('API post URL?')
+    settings['cell_timeout'] = prompt('Time between shutdown and start?')
+    # get cell connection options
+    import inspect
+    options = []
+    import cell.sprint
+    for cls in inspect.getmembers(cell.sprint, inspect.isclass):
+        if not cls[0] == 'CellConnection':
+            options.append(cls)
+    print 'Cellular options:'
+    for i, cls in enumerate(options):
+        print('  {num} - {cls}'.format(num=i, cls=cls))
+    choice = options[int(prompt('Enter number for cell connection type'))][1]
+    settings['cell_import'] = choice.__module__ + '.' + choice.__name__
     return settings
 
 
