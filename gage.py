@@ -1,10 +1,9 @@
 #!/usr/bin/python
 
 import datetime
-import time
+import logging
 import os.path
 import os
-
 from peewee import (SqliteDatabase,
                     Model,
                     DateTimeField,
@@ -13,6 +12,7 @@ from peewee import (SqliteDatabase,
                     TextField,
                     IntegerField,
                     CharField)
+import time
 
 from gage_client.gage_client.client import Client, SendError
 
@@ -22,6 +22,14 @@ import power
 
 import config
 
+logger = logging.getLogger('Rotating Log')
+logger.setLevel(config.LOG_LEVEL)
+
+handler = logging.handler.RotatingFileHandler(config.LOG_PATH,
+                                              maxBytes=config.LOG_SIZE,
+                                              backupCount=config.LOG_BACKUP)
+
+logger.addHandler(handler)
 
 db = SqliteDatabase('/boot/uboot/gage.db')
 
@@ -75,29 +83,17 @@ def send_samples(destination=config.PostURL,
     # try to send and write result to status file
     try:
         result, sucessful_ids = client.send_all()
-        with open('/boot/uboot/gage-status.txt', 'ab') as status_file:
-            status_file.write('Successfully sent at {dt} to {url}'.format(
-                dt=datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
-                url=destination,
-            ))
-            status_file.write('  sucess fully uploaded: {success}'.format(
-                success=sucessful_ids
-            ))
+        logger.info('Successfully sent at {dt} to {url}'.format(
+            dt=datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+            url=destination,
+        ))
+        logger.info('  ids uploaded: {success}'.format(success=sucessful_ids))
     except Exception as e:
-        # sucessful_ids = e.sucessful
-        with open('/boot/uboot/gage-status.txt', 'ab') as status_file:
-            status_file.write('Send error at {dt} to {url}, {detail}'.format(
-                dt=datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
-                url=destination,
-                detail=e
-            ))
-        #    status_file.write('  failed to upload: {failed}'.format(
-        #        failed=e.fail
-        #    ))
-        #    status_file.write('  sucess fully uploaded: {success}'.format(
-        #        success=e.sucessful
-        #    ))
-#
+        logger.warning('Send error at {dt} to {url}, {detail}'.format(
+            dt=datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+            url=destination,
+            detail=e
+        ))
     # for every id that was sent mark as uploaded
     else:
         sucessful_ids = set(sucessful_ids)
@@ -123,6 +119,7 @@ if __name__ == '__main__':
             get_sample()
             send_samples()
         else:
+            logger.warning('RTC time bad')
             os.system('ntpdate -b -s -u pool.ntp.org')
             os.system('/gage/powercape/util/power -w')
             get_sample()
