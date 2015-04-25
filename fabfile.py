@@ -7,6 +7,9 @@ from fabric.contrib.files import exists, sed
 from fabric.contrib.console import confirm
 from fabtools import require
 import fabtools
+import inspect
+
+from cell import sprint
 
 try:
     from fabhosts import bone
@@ -59,12 +62,14 @@ def mk_gage_folder():
 def git_gage():
     """
     Clone or update the gage-beaglebone repo
+
+    If it fails check that the time is correct
     """
     sudo('systemctl stop gage-logger.service')
     require.git.working_copy(
         'https://github.com/abkfenris/gage-beaglebone.git',
         path=gage_folder+'/gage-beaglebone',
-        branch='master',
+        branch='feature/logger',
         update=True,
         use_sudo=True)
     with cd(gage_folder+'/gage-beaglebone'):
@@ -181,12 +186,10 @@ def _settings():
     settings['depth_uart'] = prompt('Depth UART?')
     settings['serial_dev'] = prompt('Serial Device?')
     settings['url'] = prompt('API post URL?')
-    settings['cell_timeout'] = prompt('Time between shutdown and start?')
+    settings['restart_time'] = prompt('Time between shutdown and start?')
     # get cell connection options
-    import inspect
     options = []
-    import cell.sprint
-    for cls in inspect.getmembers(cell.sprint, inspect.isclass):
+    for cls in inspect.getmembers(sprint, inspect.isclass):
         if not cls[0] == 'CellConnection':
             options.append(cls)
     print 'Cellular options:'
@@ -203,7 +206,7 @@ def make_config():
     """
     settings = _settings()
     fabtools.files.upload_template(
-        'templates/config.py',
+        'templates/config-template.py',
         '/gage/gage-beaglebone/config.py',
         context=settings,
         use_sudo=True,

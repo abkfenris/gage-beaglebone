@@ -25,7 +25,7 @@ import config
 logger = logging.getLogger('Rotating Log')
 logger.setLevel(config.LOG_LEVEL)
 
-handler = logging.handler.RotatingFileHandler(config.LOG_PATH,
+handler = logging.handlers.RotatingFileHandler(config.LOG_PATH,
                                               maxBytes=config.LOG_SIZE,
                                               backupCount=config.LOG_BACKUP)
 
