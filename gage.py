@@ -20,7 +20,7 @@ from gage_client.gage_client.client import Client, SendError
 import ultrasound
 import pcape
 import power
-from utils import Timeout
+from utils import Timeout, TimeoutError
 
 import config
 
@@ -117,16 +117,19 @@ if __name__ == '__main__':
     if os.path.isfile("/boot/uboot/gagerun") and not os.path.isfile("/boot/uboot/gagestop"):
         print 'This program is running as __main__.'
         os.system('/gage/powercape/utils/power -s')
-        with Timeout(60):
-            if check_time():
-                get_sample()
-                send_samples()
-            else:
-                logger.warning('RTC time bad')
-                os.system('ntpdate -b -s -u pool.ntp.org')
-                os.system('/gage/powercape/util/power -w')
-                get_sample()
-                send_samples()
+        try:
+            with Timeout(60):
+                if check_time():
+                    get_sample()
+                    send_samples()
+                else:
+                    logger.warning('RTC time bad')
+                    os.system('ntpdate -b -s -u pool.ntp.org')
+                    os.system('/gage/powercape/util/power -w')
+                    get_sample()
+                    send_samples()
+        except TimeoutError as e:
+            logger.warning('TimeoutError: {e}'.format(e=e))
         time.sleep(15)
         if not os.path.isfile("/boot/uboot/gagestop"):
             pcape.set_time(int(config.RESTART_TIME))
