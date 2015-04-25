@@ -196,7 +196,8 @@ def _settings():
     for i, cls in enumerate(options):
         print('  {num} - {cls}'.format(num=i, cls=cls))
     choice = options[int(prompt('Enter number for cell connection type'))][1]
-    settings['cell_import'] = choice.__module__ + '.' + choice.__name__
+    settings['cell_base'] = choice.__module__
+    settings['cell_import'] = choice.__name__
     return settings
 
 
