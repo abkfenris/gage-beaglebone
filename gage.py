@@ -2,6 +2,7 @@
 
 import datetime
 import logging
+from logging.handlers import RotatingFileHandler
 import os.path
 import os
 from peewee import (SqliteDatabase,
@@ -25,7 +26,7 @@ import config
 logger = logging.getLogger('Rotating Log')
 logger.setLevel(config.LOG_LEVEL)
 
-handler = logging.handlers.RotatingFileHandler(config.LOG_PATH,
+handler = RotatingFileHandler(config.LOG_PATH,
                                               maxBytes=config.LOG_SIZE,
                                               backupCount=config.LOG_BACKUP)
 
