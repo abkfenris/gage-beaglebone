@@ -198,6 +198,7 @@ def _settings():
     choice = options[int(prompt('Enter number for cell connection type'))][1]
     settings['cell_base'] = choice.__module__
     settings['cell_import'] = choice.__name__
+    settings['startup_reasons'] = startup_reasons
     return settings
 
 
