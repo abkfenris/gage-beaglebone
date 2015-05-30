@@ -60,6 +60,6 @@ def set_startup_reasons(startup_reasons):
     Set startup reason for powercape
     """
     try:
-        os.system('i2cset -y 1 0x21 4 {startup_reason}'.format(startup_reasons=startup_reasons))
+        os.system('i2cset -y 1 0x21 4 {startup_reasons}'.format(startup_reasons=startup_reasons))
     except:
         pass
