@@ -28,8 +28,8 @@ logger = logging.getLogger('Rotating Log')
 logger.setLevel(config.LOG_LEVEL)
 
 handler = RotatingFileHandler(config.LOG_PATH,
-                                              maxBytes=config.LOG_SIZE,
-                                              backupCount=config.LOG_BACKUP)
+                              maxBytes=config.LOG_SIZE,
+                              backupCount=config.LOG_BACKUP)
 
 logger.addHandler(handler)
 
@@ -117,6 +117,10 @@ if __name__ == '__main__':
     if os.path.isfile("/boot/uboot/gagerun") and not os.path.isfile("/boot/uboot/gagestop"):
         print 'This program is running as __main__.'
         os.system('/gage/powercape/utils/power -s')
+        pcape.set_startup_reasons(config.STARTUP_REASONS)
+        # set startup timeout
+        # set SYS_RESET timeout
+        # set power timeout (SYS_RESET + a min)
         try:
             with Timeout(60):
                 if check_time():
@@ -133,6 +137,7 @@ if __name__ == '__main__':
         time.sleep(15)
         if not os.path.isfile("/boot/uboot/gagestop"):
             pcape.set_time(int(config.RESTART_TIME))
+            # set WDT stop timeout incase the power isn't cut
             os.system("shutdown -h now")
     else:
         print 'gagestop is in /boot/uboot/ or gagerun is not.'

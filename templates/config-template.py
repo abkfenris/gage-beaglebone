@@ -14,3 +14,4 @@ LOG_LEVEL = logging.INFO
 LOG_PATH = '/boot/uboot/gage-status.txt'
 LOG_SIZE = 2000000
 LOG_BACKUP = 5
+STARTUP_REASONS = {{ startup_reasons }}

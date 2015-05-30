@@ -241,6 +241,13 @@ def gagerun():
     sudo('touch /boot/uboot/gagerun')
 
 
+def gagestop():
+    """
+    Add gagestop to uboot so that the logging cycle will stop
+    """
+    sudo('touch /boot/uboot/gagestop')
+
+
 def cell_sprint_sierra_250u():
     """
     Place configuration files for a Sprint Sierra 250 U modem
