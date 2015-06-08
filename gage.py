@@ -118,9 +118,9 @@ if __name__ == '__main__':
         print 'This program is running as __main__.'
         os.system('/gage/powercape/utils/power -s')
         pcape.set_startup_reasons(config.STARTUP_REASONS)
-        # set startup timeout
+        pcape.set_wdt_start(300)
         # set SYS_RESET timeout
-        # set power timeout (SYS_RESET + a min)
+        pcape.set_wdt_stop(300)
         try:
             with Timeout(60):
                 if check_time():
@@ -137,10 +137,12 @@ if __name__ == '__main__':
         time.sleep(15)
         if not os.path.isfile("/boot/uboot/gagestop"):
             pcape.set_time(int(config.RESTART_TIME))
+            pcape.set_wdt_stop(60)
             # set WDT stop timeout incase the power isn't cut
             os.system("shutdown -h now")
     else:
         print 'gagestop is in /boot/uboot/ or gagerun is not.'
+        pcape.set_wdt
         exit()
 else:
     print 'gage.py is imported'
