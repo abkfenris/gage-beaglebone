@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import Adafruit_BBIO.GPIO as GPIO
 import datetime
 import logging
 from logging.handlers import RotatingFileHandler
@@ -34,6 +35,8 @@ handler = RotatingFileHandler(config.LOG_PATH,
 logger.addHandler(handler)
 
 db = SqliteDatabase('/boot/uboot/gage.db')
+
+GPIO.setup('P8_12', GPIO.IN)
 
 
 class BaseModel(Model):
@@ -113,6 +116,15 @@ def check_time():
     return datetime.datetime.utcnow() > sample.timestamp
 
 
+def check_switch():
+    """
+    Returns True if GPIO P8_12 is brought to 3.3 V (connected to P9_03)
+    """
+    if GPIO.input('P8_12') is 1:
+        return True
+    return False
+
+
 if __name__ == '__main__':
     if os.path.isfile("/boot/uboot/gagerun") and not os.path.isfile("/boot/uboot/gagestop"):
         print 'This program is running as __main__.'
@@ -124,10 +136,12 @@ if __name__ == '__main__':
         try:
             with Timeout(60):
                 if check_time():
+                    #with config.Cell():
                     get_sample()
                     send_samples()
                 else:
                     logger.warning('RTC time bad')
+                    #with config.Cell():
                     os.system('ntpdate -b -s -u pool.ntp.org')
                     os.system('/gage/powercape/util/power -w')
                     get_sample()
