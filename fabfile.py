@@ -252,23 +252,24 @@ def cell_sprint_sierra_250u():
     """
     Place configuration files for a Sprint Sierra 250 U modem
     """
-    with lcd('cell/sprint/sierra250u/config-files'):
-        with cd('/etc'):
-            require.file('open.resolv.conf',
-                         source='open.resolv.conf',
+    #require.deb.packages(['ppp','pppconfig'])
+    #with lcd('cell/sprint/sierra250u/config_files/'):
+    with cd('/etc'):
+        require.file('open.resolv.conf',
+                     source='cell/sprint/sierra250u/config_files/open.resolv.conf',
+                     use_sudo=True)
+        with cd('ppp'):
+            sudo('cp options options.origional')
+            require.file('options',
+                         source='cell/sprint/sierra250u/config_files/options',
                          use_sudo=True)
-            with cd('ppp'):
-                sudo('cp options options.origional')
-                require.file('options',
-                             source='options',
+            require.file('ip-up',
+                         source='cell/sprint/sierra250u/config_files/options',
+                         use_sudo=True)
+            with cd('peers'):
+                require.file('gprs-connect-chat',
+                             source='cell/sprint/sierra250u/config_files/gprs-connect-chat',
                              use_sudo=True)
-                require.file('ip-up',
-                             source='options',
-                             use_sudo=True)
-                with cd('peers'):
-                    require.file('gprs-connect-chat',
-                                 source='gprs-connect-chat',
-                                 use_sudo=True)
 
 
 def bootstrap():
