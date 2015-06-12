@@ -156,7 +156,7 @@ if __name__ == '__main__':
             os.system("shutdown -h now")
     else:
         print 'gagestop is in /boot/uboot/ or gagerun is not.'
-        pcape.set_wdt
+        pcape.set_wdt_stop(0)
         exit()
 else:
     print 'gage.py is imported'

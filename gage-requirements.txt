@@ -3,3 +3,4 @@ itsdangerous
 requests
 pyserial
 peewee
+ipython
