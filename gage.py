@@ -154,6 +154,10 @@ if __name__ == '__main__':
             pcape.set_wdt_stop(60)
             # set WDT stop timeout incase the power isn't cut
             os.system("shutdown -h now")
+        else:
+            print('gagestop in /boot/uboot/ or P8_12 connected to 3.3V (P9_3)')
+            pcape.set_wdt_stop(0)
+            exit()
     else:
         print 'gagestop is in /boot/uboot/ or gagerun is not.'
         pcape.set_wdt_stop(0)
