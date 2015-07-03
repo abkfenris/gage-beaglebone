@@ -148,7 +148,7 @@ if __name__ == '__main__':
                     send_samples()
         except TimeoutError as e:
             logger.warning('TimeoutError: {e}'.format(e=e))
-        time.sleep(15)
+        time.sleep(30)
         if not os.path.isfile("/boot/uboot/gagestop") or not check_switch():
             pcape.set_time(int(config.RESTART_TIME))
             pcape.set_wdt_stop(60)

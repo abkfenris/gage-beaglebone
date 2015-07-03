@@ -10,7 +10,7 @@ export SHLVL=2
 exportLOGNAME=root
 
 #The script included jusb below gets the right USB port in an /etc/tty_sierra file
-/home/root/usb_discover.sh
+./usb_discover.sh
 
 #The my_provider is a template of options lacking the usb port
 cat /home/root/my_provider > /etc/ppp/peers/provider
@@ -27,7 +27,7 @@ echo Now turning on ppp
 sleep 30
 
 echo Now updating the resolver with saved resolver nameservers
-cp /etc/open.resolv.conf /etc/resolv.conf
+cp ./config_files/open.resolv.conf /etc/resolv.conf
 cat /etc/resolv.conf
 export gw=`ifconfig ppp0 |grep inet | awk '{print $3}'|sed /P-t-P:/s///`
 export PPP0=`ifconfig ppp0 | grep "inet addr" | awk '{ print $2 }' | awk 'BEGIN { FS=":" } { print $2 }'`
