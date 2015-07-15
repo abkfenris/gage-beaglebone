@@ -134,18 +134,19 @@ if __name__ == '__main__':
         # set SYS_RESET timeout
         pcape.set_wdt_stop(300)
         try:
-            with Timeout(60):
-                if check_time():
-                    #with config.Cell():
-                    get_sample()
-                    send_samples()
-                else:
-                    logger.warning('RTC time bad')
-                    #with config.Cell():
-                    os.system('ntpdate -b -s -u pool.ntp.org')
-                    os.system('/gage/powercape/util/power -w')
-                    get_sample()
-                    send_samples()
+            if check_time():
+                get_sample()
+                with config.Cell():
+                    with Timeout(60):
+                        send_samples()
+            else:
+                logger.warning('RTC time bad')
+                with config.Cell():
+                    with Timeout(120):
+                        os.system('ntpdate -b -s -u pool.ntp.org')
+                        os.system('/gage/powercape/util/power -w')
+                        get_sample()
+                        send_samples()
         except TimeoutError as e:
             logger.warning('TimeoutError: {e}'.format(e=e))
         time.sleep(30)

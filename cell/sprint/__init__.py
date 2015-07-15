@@ -25,7 +25,7 @@ class Sierra250U(CellConnection):
                 break
             time.sleep(6)
         else:
-            raise TimeoutError
+            raise TimeoutError('Unable to dial a cell connection')
 
     def __exit__(self, exc_type, exc_value, traceback):
         # Try to turn off ppp
