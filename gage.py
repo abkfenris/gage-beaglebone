@@ -133,6 +133,7 @@ if __name__ == '__main__':
         pcape.set_wdt_start(300)
         # set SYS_RESET timeout
         pcape.set_wdt_stop(300)
+        db.create_tables([Sample, Config], safe=True)
         try:
             if check_time():
                 get_sample()
