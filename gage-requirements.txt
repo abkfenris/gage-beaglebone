@@ -4,3 +4,4 @@ requests
 pyserial
 peewee
 ipython
+netifaces

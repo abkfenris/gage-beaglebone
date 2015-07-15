@@ -8,6 +8,7 @@ from fabric.contrib.console import confirm
 from fabtools import require
 import fabtools
 import inspect
+import importlib
 
 from cell import sprint
 
@@ -248,28 +249,17 @@ def gagestop():
     sudo('touch /boot/uboot/gagestop')
 
 
-def cell_sprint_sierra_250u():
+def setup_cell():
     """
-    Place configuration files for a Sprint Sierra 250 U modem
+    Setup cell by getting settings option, and install files
     """
-    #require.deb.packages(['ppp','pppconfig'])
-    #with lcd('cell/sprint/sierra250u/config_files/'):
-    with cd('/etc'):
-        require.file('open.resolv.conf',
-                     source='cell/sprint/sierra250u/config_files/open.resolv.conf',
-                     use_sudo=True)
-        with cd('ppp'):
-            sudo('cp options options.origional')
-            require.file('options',
-                         source='cell/sprint/sierra250u/config_files/options',
-                         use_sudo=True)
-            require.file('ip-up',
-                         source='cell/sprint/sierra250u/config_files/options',
-                         use_sudo=True)
-            with cd('peers'):
-                require.file('gprs-connect-chat',
-                             source='cell/sprint/sierra250u/config_files/gprs-connect-chat',
-                             use_sudo=True)
+    settings = _settings()
+    cell_base = settings['cell_base']
+    cell_import = settings['cell_import']
+    Cellmod = importlib.import_module(cell_base)
+    Cell = getattr(Cellmod, cell_import)
+    c = Cell()
+    c.install()
 
 
 def bootstrap():
