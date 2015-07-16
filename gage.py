@@ -138,14 +138,16 @@ if __name__ == '__main__':
             if check_time():
                 get_sample()
                 with config.Cell():
+                    time.sleep(30)
                     with Timeout(60):
                         send_samples()
             else:
                 logger.warning('RTC time bad')
                 with config.Cell():
+                    time.sleep(30)
                     with Timeout(120):
                         os.system('ntpdate -b -s -u pool.ntp.org')
-                        os.system('/gage/powercape/util/power -w')
+                        os.system('/gage/powercape/utils/power -w')
                         get_sample()
                         send_samples()
         except TimeoutError as e:
@@ -154,7 +156,7 @@ if __name__ == '__main__':
             logger.warning('SendError: {e}'.format(e=e))
         except Exception as e:
             logger.warning('Unknown error: {e}'.format(e=e))
-        time.sleep(30)
+
         if not os.path.isfile("/boot/uboot/gagestop") or not check_switch():
             pcape.set_time(int(config.RESTART_TIME))
             pcape.set_wdt_stop(60)
