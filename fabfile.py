@@ -70,7 +70,7 @@ def git_gage():
     require.git.working_copy(
         'https://github.com/abkfenris/gage-beaglebone.git',
         path=gage_folder+'/gage-beaglebone',
-        branch='feature/sprint',
+        branch='feature/pymaxbotix',
         update=True,
         use_sudo=True)
     with cd(gage_folder+'/gage-beaglebone'):

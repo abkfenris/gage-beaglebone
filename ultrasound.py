@@ -3,8 +3,11 @@ import Adafruit_BBIO.GPIO as GPIO
 import Adafruit_BBIO.UART as UART
 import serial  # aka pyserial
 import time
-from numpy import mean
+import numpy as np
 import config
+import logging
+
+logger = logging.getLogger(__name__)
 
 UART.setup(config.DepthUART)
 
@@ -18,7 +21,11 @@ ser.parity = serial.PARITY_NONE
 ser.stopbits = serial.STOPBITS_ONE
 
 
-def checkDepth(j=3):
+def reject_outliers(data, m=2):
+    return data[abs(data - np.mean(data)) < m * np.std(data)]
+
+
+def checkDepth(samples=3):
 
     currentDepthList = []  # create an empty array to store the depth values
 
@@ -28,7 +35,7 @@ def checkDepth(j=3):
 
     time.sleep(.5)  # give time for the sensor to wake up and start
 
-    for i in range(0, j):
+    for i in range(0, samples):
         ser.open()
         ser.flushOutput()
         ser.flushInput()
@@ -41,5 +48,6 @@ def checkDepth(j=3):
         time.sleep(.5)  # Take a half second between reading ranges
 
     # GPIO.output(config.DepthGPIO, GPIO.LOW)
-    currentDepth = mean(currentDepthList)
+    currentDepth = np.mean(currentDepthList)
+    logger.info('Mean depth %s from %s', currentDepth, currentDepthList)
     return currentDepth

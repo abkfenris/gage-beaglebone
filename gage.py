@@ -34,6 +34,17 @@ handler = RotatingFileHandler(config.LOG_PATH,
 
 logger.addHandler(handler)
 
+try:
+    config.RAVEN
+except NameError:
+    pass
+else:
+    from raven.handlers.logging import SentryHandler
+    from raven.conf import setup_logging
+    sentry_handler = SentryHandler(config.RAVEN)
+    setup_logging(sentry_handler)
+
+
 db = SqliteDatabase('/boot/uboot/gage.db')
 
 GPIO.setup('P8_12', GPIO.IN)
@@ -59,7 +70,7 @@ class Config(BaseModel):
 
 
 def get_sample():
-    level = ultrasound.checkDepth()
+    level = ultrasound.checkDepth(samples=20)
     # remove the microsecond
     # http://stackoverflow.com/questions/7999935/python-datetime-to-string-without-microsecond-component
     timestamp = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
