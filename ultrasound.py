@@ -5,6 +5,9 @@ import serial  # aka pyserial
 import time
 from numpy import mean
 import config
+import logging
+
+logger = logging.getLogger(__name__)
 
 UART.setup(config.DepthUART)
 
@@ -18,7 +21,7 @@ ser.parity = serial.PARITY_NONE
 ser.stopbits = serial.STOPBITS_ONE
 
 
-def checkDepth(j=3):
+def checkDepth(samples=3):
 
     currentDepthList = []  # create an empty array to store the depth values
 
@@ -28,7 +31,7 @@ def checkDepth(j=3):
 
     time.sleep(.5)  # give time for the sensor to wake up and start
 
-    for i in range(0, j):
+    for i in range(0, samples):
         ser.open()
         ser.flushOutput()
         ser.flushInput()
@@ -42,4 +45,5 @@ def checkDepth(j=3):
 
     # GPIO.output(config.DepthGPIO, GPIO.LOW)
     currentDepth = mean(currentDepthList)
+    logger.info('%s mean found from %s', currentDepth, currentDepthList)
     return currentDepth

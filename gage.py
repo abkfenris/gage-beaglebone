@@ -25,7 +25,7 @@ from utils import Timeout, TimeoutError
 
 import config
 
-logger = logging.getLogger('Rotating Log')
+logger = logging.getLogger(__name__)
 logger.setLevel(config.LOG_LEVEL)
 
 handler = RotatingFileHandler(config.LOG_PATH,
@@ -59,7 +59,7 @@ class Config(BaseModel):
 
 
 def get_sample():
-    level = ultrasound.checkDepth()
+    level = ultrasound.checkDepth(samples=20)
     # remove the microsecond
     # http://stackoverflow.com/questions/7999935/python-datetime-to-string-without-microsecond-component
     timestamp = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
