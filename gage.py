@@ -44,7 +44,9 @@ except AttributeError:
 else:
     from raven.handlers.logging import SentryHandler
     from raven.conf import setup_logging
-    sentry_handler = SentryHandler(config.RAVEN)
+    from raven import Client as RavenClient
+    sentry_client = RavenClient(config.Raven)
+    sentry_handler = SentryHandler(sentry_client)
     logger.addHandler(sentry_handler)
     setup_logging(sentry_handler)
 
