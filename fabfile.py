@@ -50,6 +50,7 @@ def apt_upgrade():
     Update and upgrade apt
     """
     require.deb.uptodate_index(max_age={'day': 1})
+    #sudo('apt-get dist-upgrade')
     sudo('apt-get upgrade')
 
 
@@ -84,8 +85,9 @@ def python_requirements():
     Install required packages for python
     """
     require.deb.packages(['python-smbus', 'python-numpy', 'minicom'])
+    require.python.install('ipython[notebook]', use_sudo=True)
     require.python.requirements(
-        gage_folder+'/gage-beaglebone/gage-requirements.txt')
+        gage_folder+'/gage-beaglebone/gage-requirements.txt', use_sudo=True)
 
 
 def powercape_requirements():
@@ -273,6 +275,10 @@ def bootstrap():
     python_requirements()
     git_powercape()
     powercape_requirements()
+    # powercape_update_bootloader()
+    # powercape_rtc_set()
+    # powercape_rtc_use()
     powercape_startup_set()
     service_add()
     gagerun()
+    # service_start()

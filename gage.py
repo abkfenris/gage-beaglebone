@@ -36,7 +36,7 @@ logger.addHandler(handler)
 
 try:
     config.RAVEN
-except NameError:
+except AttributeError:
     pass
 else:
     from raven.handlers.logging import SentryHandler

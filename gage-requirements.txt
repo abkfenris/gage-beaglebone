@@ -6,3 +6,4 @@ peewee
 ipython
 netifaces
 raven
+git+https://github.com/simondlevy/PyMaxBotix.git
