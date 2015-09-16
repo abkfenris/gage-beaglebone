@@ -38,9 +38,9 @@ streamhandler = logging.StreamHandler(sys.stdout)
 logger.addHandler(streamhandler)
 
 try:
-    config.Raven
+    config.RAVEN
 except AttributeError:
-    pass
+    logger.exception('Unable to access config.RAVEN. Not logging to Sentry')
 else:
     from raven.handlers.logging import SentryHandler
     from raven.conf import setup_logging
