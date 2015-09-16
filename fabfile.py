@@ -108,6 +108,7 @@ def git_powercape():
         )
     with cd(gage_folder+'/powercape/utils'):
         sudo('make powercape')
+        sudo('make')
 
 
 def powercape_update_bootloader():

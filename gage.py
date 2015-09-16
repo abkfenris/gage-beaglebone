@@ -6,6 +6,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 import os.path
 import os
+import sys
 from peewee import (SqliteDatabase,
                     Model,
                     DateTimeField,
@@ -33,6 +34,20 @@ handler = RotatingFileHandler(config.LOG_PATH,
                               backupCount=config.LOG_BACKUP)
 
 logger.addHandler(handler)
+streamhandler = logging.StreamHandler(sys.stdout)
+logger.addHandler(streamhandler)
+
+#try:
+#    config.Raven
+#except AttributeError:
+#    pass
+#else:
+#    from raven.handlers.logging import SentryHandler
+#    from raven.conf import setup_logging
+#    sentry_handler = SentryHandler(config.RAVEN)
+#    setup_logging(sentry_handler)
+
+
 
 db = SqliteDatabase('/boot/uboot/gage.db')
 
