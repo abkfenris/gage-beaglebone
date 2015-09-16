@@ -25,7 +25,7 @@ from utils import Timeout, TimeoutError
 
 import config
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('gage')
 logger.setLevel(config.LOG_LEVEL)
 
 handler = RotatingFileHandler(config.LOG_PATH,
