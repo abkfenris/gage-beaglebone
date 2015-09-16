@@ -45,6 +45,7 @@ else:
     from raven.handlers.logging import SentryHandler
     from raven.conf import setup_logging
     sentry_handler = SentryHandler(config.RAVEN)
+    logger.addHandler(sentry_handler)
     setup_logging(sentry_handler)
 
 
