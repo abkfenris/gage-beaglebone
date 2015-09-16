@@ -37,15 +37,15 @@ logger.addHandler(handler)
 streamhandler = logging.StreamHandler(sys.stdout)
 logger.addHandler(streamhandler)
 
-#try:
-#    config.Raven
-#except AttributeError:
-#    pass
-#else:
-#    from raven.handlers.logging import SentryHandler
-#    from raven.conf import setup_logging
-#    sentry_handler = SentryHandler(config.RAVEN)
-#    setup_logging(sentry_handler)
+try:
+    config.Raven
+except AttributeError:
+    pass
+else:
+    from raven.handlers.logging import SentryHandler
+    from raven.conf import setup_logging
+    sentry_handler = SentryHandler(config.RAVEN)
+    setup_logging(sentry_handler)
 
 
 
