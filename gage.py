@@ -142,7 +142,7 @@ def check_switch():
 
 if __name__ == '__main__':
     if os.path.isfile("/boot/uboot/gagerun") and not os.path.isfile("/boot/uboot/gagestop"):
-        print 'This program is running as __main__.'
+        logger.info('This program is running as __main__.')
         os.system('/gage/powercape/utils/power -s')
         pcape.set_startup_reasons(config.STARTUP_REASONS)
         pcape.set_wdt_start(300)
@@ -178,11 +178,11 @@ if __name__ == '__main__':
             # set WDT stop timeout incase the power isn't cut
             os.system("shutdown -h now")
         else:
-            print('gagestop in /boot/uboot/ or P8_12 connected to 3.3V (P9_3)')
+            logger.error('gagestop in /boot/uboot/ or P8_12 connected to 3.3V (P9_3)')
             pcape.set_wdt_stop(0)
             exit()
     else:
-        print 'gagestop is in /boot/uboot/ or gagerun is not.'
+        logger.error('gagestop is in /boot/uboot/ or gagerun is not.')
         pcape.set_wdt_stop(0)
         exit()
 else:
