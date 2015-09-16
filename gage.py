@@ -1,4 +1,7 @@
 #!/usr/bin/python
+import time
+
+time.sleep(30)
 
 import Adafruit_BBIO.GPIO as GPIO
 import datetime
@@ -15,7 +18,6 @@ from peewee import (SqliteDatabase,
                     TextField,
                     IntegerField,
                     CharField)
-import time
 
 from gage_client.gage_client.client import Client, SendError
 
