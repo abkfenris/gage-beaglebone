@@ -7,6 +7,8 @@ CMD apk add --no-cache \
     py-numpy \
     linux-headers
 
+CMD apk add minicom --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/main/
+CMD sh -c "echo 'BB-UART2' > /sys/devices/platform/bone_capemgr/slots"
 # CMD apk add i2c-tools-dev --update-cache --allow-untrusted --repository http://dl-3.alpinelinux.org/alpine/edge/testing/
 
 CMD git clone https://github.com/AndiceLabs/PowerCape.git
@@ -14,8 +16,8 @@ CMD git clone https://github.com/AndiceLabs/PowerCape.git
 #CMD make powercape && make
 
 #CMD pip install spidev --no-cache-dir
-#COPY app/gage-requirements.txt ./
-#CMD pip install --no-cache-dir -r gage-requirements.txt
+COPY app/gage-requirements.txt ./
+CMD pip install --no-cache-dir -r gage-requirements.txt
 
 COPY app ./
 
