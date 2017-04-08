@@ -1,0 +1,5 @@
+FROM resin/%%RESIN_MACHINE_NAME%%-alpine-python:3.6
+
+COPY app ./
+
+CMD while : ; do echo "Idling..."; sleep ${INTERVAL=600}; done

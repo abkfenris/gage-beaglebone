@@ -1,0 +1,243 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Building &mdash; gage-beaglebone 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="gage-beaglebone 0.1 documentation" href="index.html"/>
+        <link rel="next" title="Installation" href="install.html"/>
+        <link rel="prev" title="Welcome to gage-beaglebone’s documentation!" href="index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+          <a href="index.html" class="fa fa-home"> gage-beaglebone</a>
+        
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">Building</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#parts-to-acqure">Parts to acqure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inverting">Inverting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install.html#update-the-distro">Update the distro</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#initial-setup">Initial setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#magic-aka-fabric">Magic - aka Fabric</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#testing-serial">Testing Serial</a></li>
+</ul>
+</li>
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">gage-beaglebone</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Building</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/build.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <div class="section" id="building">
+<h1>Building<a class="headerlink" href="#building" title="Permalink to this headline">¶</a></h1>
+<p>After you&#8217;ve chosen a site, and figured out if there is cell coverage, it&#8217;s time
+to build a gage for that site.</p>
+<div class="section" id="parts-to-acqure">
+<h2>Parts to acqure<a class="headerlink" href="#parts-to-acqure" title="Permalink to this headline">¶</a></h2>
+<p>I&#8217;ve sorted the parts needed to build the exact same gage out by the same source
+that I&#8217;ve bought them from, but some can be found elsewhere too.</p>
+<div class="section" id="adafruit">
+<h3>Adafruit<a class="headerlink" href="#adafruit" title="Permalink to this headline">¶</a></h3>
+<p>Adafruit is a great place for basic geeking supplies, from a soldering iron
+(which you may also need to acquire, I got the <a class="reference external" href="https://www.adafruit.com/products/136">Ladyada&#8217;s Electronic Toolkit</a>
+for my soldering iron, multimeter and other basic tools. )</p>
+<ul class="simple">
+<li><a class="reference external" href="https://www.adafruit.com/products/1996">BeagleBone Black</a> Rev C or <a class="reference external" href="https://www.adafruit.com/products/703">Adafruit BeagleBone Black Starter Pack</a> which comes with other goodies that are helpful like a baseplate that can be screwed or bolted to something.</li>
+<li><a class="reference external" href="https://www.adafruit.com/product/1137">Maxbotix Weather-Resistant Ultrasonic Rangefinder</a></li>
+<li><a class="reference external" href="https://www.adafruit.com/products/1525">6V 5.6W Solar Panel</a></li>
+<li><a class="reference external" href="https://www.adafruit.com/products/353">3.7V 6600mAh Lithium Ion Battery Pack</a></li>
+<li><a class="reference external" href="https://www.adafruit.com/products/572">Beaglebone Proto Cape</a></li>
+<li><a class="reference external" href="https://www.adafruit.com/products/757">Adafruit Bi-directional Level Shifter</a></li>
+<li><a class="reference external" href="https://www.adafruit.com/products/756">NPN Transistor</a></li>
+</ul>
+</div>
+<div class="section" id="amazon">
+<h3>Amazon<a class="headerlink" href="#amazon" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference external" href="http://www.amazon.com/gp/product/B000VYGMF2/">Orbit 57095 Sprinkler System Box</a></li>
+</ul>
+</div>
+<div class="section" id="maxbotix">
+<h3>Maxbotix<a class="headerlink" href="#maxbotix" title="Permalink to this headline">¶</a></h3>
+<p>You could also order the Ultrasonic Rangefinder MB7092 XL direct from Maxbotix.
+I do believe that they may have some sensors that don&#8217;t need to have an inverter
+that this current model does.</p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.maxbotix.com/Ultrasonic_Sensors/MB7950.htm">MB7950 Mounting Hardware</a></li>
+</ul>
+</div>
+<div class="section" id="andicelabs">
+<h3>Andicelabs<a class="headerlink" href="#andicelabs" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference external" href="https://www.adafruit.com/products/572">Andicelabs Power Cape</a></li>
+<li><a class="reference external" href="https://www.adafruit.com/products/572">Stacking Connectors</a></li>
+</ul>
+</div>
+<div class="section" id="digikey">
+<h3>Digikey<a class="headerlink" href="#digikey" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference external" href="http://www.digikey.com/product-detail/en/RNMF14FTC10K0/S10KCACT-ND/2617809">10K Ohm Resistor</a></li>
+<li><a class="reference external" href="http://www.digikey.com/product-detail/en/RNMF14FTC1K00/S1KCACT-ND/2617458">1K Ohm Resistor</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="inverting">
+<h2>Inverting<a class="headerlink" href="#inverting" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://blog.lemoneerlabs.com/post/Hearing-aids">http://blog.lemoneerlabs.com/post/Hearing-aids</a></p>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="install.html" class="btn btn-neutral float-right" title="Installation">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Welcome to gage-beaglebone’s documentation!"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Alex Kerney.
+    </p>
+  </div>
+
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
