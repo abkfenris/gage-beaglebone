@@ -66,7 +66,7 @@ def git_gage():
 
     If it fails check that the time is correct
     """
-    sudo('systemctl stop gage-logger.service')
+    #sudo('systemctl stop gage-logger.service')
     require.git.working_copy(
         'https://github.com/abkfenris/gage-beaglebone.git',
         path=gage_folder+'/gage-beaglebone',
@@ -267,13 +267,13 @@ def bootstrap():
     """
     Setup all the things to make gage-beaglebone work
     """
-    apt_upgrade()
-    clean_shutdown()
-    mk_gage_folder()
-    git_gage()
+    #apt_upgrade()
+    #clean_shutdown()
+    #mk_gage_folder()
+    #git_gage()
     python_requirements()
-    git_powercape()
-    powercape_requirements()
-    powercape_startup_set()
-    service_add()
-    gagerun()
+    #git_powercape()
+    #powercape_requirements()
+    #powercape_startup_set()
+    #service_add()
+    #gagerun()
