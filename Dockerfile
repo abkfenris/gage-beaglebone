@@ -1,4 +1,4 @@
-FROM resin/%%RESIN_MACHINE_NAME%%-alpine-python:3.6
+FROM resin/beaglebone-alpine-python:3.6
 
 RUN apk add --no-cache \
     gcc-avr \
@@ -19,9 +19,10 @@ RUN git clone https://github.com/AndiceLabs/PowerCape.git
 
 #CMD pip install spidev --no-cache-dir
 
-COPY /gage/app/gage-requirements.txt ./
+COPY /app/gage-requirements.txt /gage
 RUN pip install --no-cache-dir -r /gage/gage-requirements.txt
 
 COPY app /gage
 
 CMD while : ; do echo "Idling..."; sleep ${INTERVAL=600}; done
+#CMD python simple.py
