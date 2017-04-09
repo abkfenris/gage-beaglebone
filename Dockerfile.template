@@ -11,14 +11,17 @@ RUN apk add minicom --no-cache --repository http://dl-3.alpinelinux.org/alpine/e
 # RUN sh -c "echo 'BB-UART2' > /sys/devices/platform/bone_capemgr/slots"
 # CMD apk add i2c-tools-dev --update-cache --allow-untrusted --repository http://dl-3.alpinelinux.org/alpine/edge/testing/
 
+RUN mkdir gage
+WORKDIR /gage
 RUN git clone https://github.com/AndiceLabs/PowerCape.git
 #WORKDIR PowerCape/utils
 #CMD make powercape && make
 
 #CMD pip install spidev --no-cache-dir
-COPY app/gage-requirements.txt ./
-RUN pip install --no-cache-dir -r gage-requirements.txt
 
-COPY app ./
+COPY /gage/app/gage-requirements.txt ./
+RUN pip install --no-cache-dir -r /gage/gage-requirements.txt
+
+COPY app /gage
 
 CMD while : ; do echo "Idling..."; sleep ${INTERVAL=600}; done
