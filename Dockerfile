@@ -18,6 +18,7 @@ RUN mkdir gage
 WORKDIR /gage
 
 RUN git clone https://github.com/AndiceLabs/PowerCape.git
+
 # patch powercape to work on i2c bus 2
 COPY /app/fix_powercape.patch /gage
 WORKDIR /gage/PowerCape
@@ -27,8 +28,6 @@ RUN git apply /gage/fix_powercape.patch
 WORKDIR /gage/PowerCape/utils
 RUN make
 
-#CMD pip install spidev --no-cache-dir
-
 WORKDIR /gage
 COPY /app/gage-requirements.txt /gage
 RUN pip install --no-cache-dir -r /gage/gage-requirements.txt
@@ -36,4 +35,4 @@ RUN pip install --no-cache-dir -r /gage/gage-requirements.txt
 COPY app /gage
 
 CMD while : ; do echo "Idling..."; sleep ${INTERVAL=600}; done
-# CMD python simple.py
+#CMD python simple.py
