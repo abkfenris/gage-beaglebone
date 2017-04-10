@@ -2,27 +2,28 @@ FROM resin/beaglebone-python:3.5
 
 RUN apt-get update
 RUN apt-get install -y \
-    #python-smbus \
-    #python3-numpy \
     minicom \
     gcc-avr \ 
     # may have an issue with gcc avr
     avr-libc \
     avrdude \
-    unzip
-# RUN pip install numpy use statistics in stdlib for stddev
+    unzip \
+    libi2c-dev
+
 # RUN sh -c "echo 'BB-UART2' > /sys/devices/platform/bone_capemgr/slots"
-# CMD apk add i2c-tools-dev --update-cache --allow-untrusted --repository http://dl-3.alpinelinux.org/alpine/edge/testing/
+RUN pip install --no-cache-dir cffi
+RUN pip install --no-cache-dir smbus-cffi
 
 RUN mkdir gage
 WORKDIR /gage
 
-# RUN wget http://ftp.us.debian.org/debian/pool/main/i/i2c-tools/python3-smbus_3.1.2-3_armhf.deb
-# RUN dpkg -i python3-smbus_3.1.2-3_armhf.deb
-# RUN mv python3-smbus_3.1.2-3_armhf.deb /var/cache/apt/archives/
-# RUN apt-get install -y python3-smbus
-
 RUN git clone https://github.com/AndiceLabs/PowerCape.git
+# patch powercape to work on i2c bus 2
+COPY /app/fix_powercape.patch /gage
+WORKDIR /gage/PowerCape
+RUN git apply /gage/fix_powercape.patch
+
+# build powercape utils
 WORKDIR /gage/PowerCape/utils
 RUN make
 
