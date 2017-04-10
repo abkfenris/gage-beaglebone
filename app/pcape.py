@@ -1,7 +1,7 @@
 import os
 from Adafruit_I2C import Adafruit_I2C
 
-powercapeI2C = Adafruit_I2C(0x21)
+powercapeI2C = Adafruit_I2C(0x21, 2)
 
 
 def set_time(cycle_time):
@@ -60,6 +60,6 @@ def set_startup_reasons(startup_reasons):
     Set startup reason for powercape
     """
     try:
-        os.system('i2cset -y 1 0x21 4 {startup_reasons}'.format(startup_reasons=startup_reasons))
+        os.system('i2cset -y 2 0x21 4 {startup_reasons}'.format(startup_reasons=startup_reasons))
     except:
         pass

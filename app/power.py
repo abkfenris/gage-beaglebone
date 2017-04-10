@@ -2,7 +2,7 @@
 # import Adafruit_BBIO.ADC as ADC
 import time
 from ina.Subfact_ina219 import INA219
-import numpy
+import statistics
 
 ina = INA219()
 
@@ -18,7 +18,7 @@ def checkPower(j=3):
         currentPowerList.append(ina.getBusVoltage_V())
         time.sleep(.5)  # Take a half second between reading ranges
 
-    currentPower = numpy.mean(currentPowerList)
+    currentPower = statistics.mean(currentPowerList)
     return currentPower
 
 
@@ -31,7 +31,7 @@ def checkVolts(j=3):
         currentVoltsList.append(ina.getBusVoltage_V())
         time.sleep(.5)
 
-    currentVolts = numpy.mean(currentVoltsList)
+    currentVolts = statistics.mean(currentVoltsList)
     return currentVolts
 
 
@@ -45,5 +45,5 @@ def checkAmps(j=3):
         currentAmpsList.append(ina.getCurrent_mA())
         time.sleep(.5)
 
-    currentAmps = numpy.mean(currentAmpsList)
+    currentAmps = statistics.mean(currentAmpsList)
     return currentAmps

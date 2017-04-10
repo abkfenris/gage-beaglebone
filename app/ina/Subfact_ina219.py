@@ -96,7 +96,7 @@ class INA219:
 
 	# Constructor
 	def __init__(self, address=0x40, debug=False):
-		self.i2c = Adafruit_I2C(address, debug=False)
+		self.i2c = Adafruit_I2C(address, 2, debug=False)
 		self.address = address
 		self.debug = debug
 		
