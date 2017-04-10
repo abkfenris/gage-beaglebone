@@ -1,7 +1,9 @@
-import time, datetime
+import time, datetime, os
 import serial
 
 PORT = '/dev/ttyS2'
+
+wait = int(os.environ.get('GAGE_SIMPLE_WAIT', 5))
 
 ser = serial.Serial(port=PORT, baudrate=9600, bytesize=8, parity='N', stopbits=1)
 
@@ -16,4 +18,4 @@ def read_serial():
 while True:
     data = read_serial()
     print(datetime.datetime.now(), data)
-    time.sleep(5)
+    time.sleep(wait)
