@@ -1,4 +1,4 @@
-FROM resin/beaglebone-python:3.6
+FROM resin/beaglebone-python:3.5
 
 RUN apt-get update
 RUN apt-get install -y \
