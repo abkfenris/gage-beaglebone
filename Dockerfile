@@ -1,13 +1,6 @@
-FROM resin/beaglebone-alpine-python:3.6
+FROM resin/beaglebone-python:3.6
 
-RUN apk add --no-cache \
-    gcc-avr \
-    avr-libc \
-    avrdude \
-    py-numpy \
-    linux-headers
 
-RUN apk add minicom --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/main/
 # RUN sh -c "echo 'BB-UART2' > /sys/devices/platform/bone_capemgr/slots"
 # CMD apk add i2c-tools-dev --update-cache --allow-untrusted --repository http://dl-3.alpinelinux.org/alpine/edge/testing/
 
@@ -24,5 +17,5 @@ RUN pip install --no-cache-dir -r /gage/gage-requirements.txt
 
 COPY app /gage
 
-#CMD while : ; do echo "Idling..."; sleep ${INTERVAL=600}; done
-CMD python simple.py
+CMD while : ; do echo "Idling..."; sleep ${INTERVAL=600}; done
+# CMD python simple.py
