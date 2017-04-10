@@ -10,7 +10,7 @@ RUN apt-get install -y \
     avr-libc \
     avrdude \
     unzip
-RUN pip install numpy
+# RUN pip install numpy use statistics in stdlib for stddev
 # RUN sh -c "echo 'BB-UART2' > /sys/devices/platform/bone_capemgr/slots"
 # CMD apk add i2c-tools-dev --update-cache --allow-untrusted --repository http://dl-3.alpinelinux.org/alpine/edge/testing/
 
