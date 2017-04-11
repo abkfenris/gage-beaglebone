@@ -72,7 +72,12 @@ def clean_sample_mean(sample_func, low, high, min_samples, max_attempts, max_std
                 return statistics.mean(cleaned)
     
     if len(cleaned) < min_samples:
-        raise TooFewSamples('Too few cleaned samples')
+        if low in samples:
+            raise TooFewSamples(f'Too few cleaned samples that were not too low ({low})')
+        elif high in samples:
+            raise TooFewSamples(f'Too few cleaned samples that were not too high ({high})')
+        else:
+            raise TooFewSamples('Too few cleaned samples')
     
     stdev = round(statistics.stdev(cleaned), 2)
     raise SamplingError(f'Stdev ({stdev}) did not meet criteria ({max_std_dev}) in {max_attempts}')
