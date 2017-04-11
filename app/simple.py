@@ -41,9 +41,15 @@ def read_serial():
 
 if __name__ == '__main__':
     while True:
-        data = read_serial()
+        distance = read_serial()
         date = datetime.datetime.now()
-        volts = power.checkVolts()
-        amps = power.checkAmps()
-        logger.info(f'{date} {data} {volts} {amps}')
+        volts = round(power.checkVolts(), 2)
+        amps = round(power.checkAmps(), 2)
+        if amps < 0:
+            amps = f'charging {amps}'
+        elif amps < 2:
+            amps = f'float {amps}'
+        else:
+            amps = f'discharging {amps}'
+        logger.info(f'{date} {distance}mm {volts}v {amps}ma')
         time.sleep(WAIT)

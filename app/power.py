@@ -1,11 +1,9 @@
 #!/usr/bin/python
-# import Adafruit_BBIO.ADC as ADC
-import time
-from ina.Subfact_ina219 import INA219
-import statistics
 
-ina = INA219()
+import time, statistics, subprocess
 
+SLEEP_TIME = .01
+PATH = '/gage/PowerCape/utils/ina219'
 
 def checkPower(j=3):
     """
@@ -16,7 +14,7 @@ def checkPower(j=3):
 
     for i in range(0, j):
         currentPowerList.append(ina.getBusVoltage_V())
-        time.sleep(.5)  # Take a half second between reading ranges
+        time.sleep(SLEEP_TIME)
 
     currentPower = statistics.mean(currentPowerList)
     return currentPower
@@ -28,8 +26,12 @@ def checkVolts(j=3):
     """
     currentVoltsList = []
     for i in range(0, j):
-        currentVoltsList.append(ina.getBusVoltage_V())
-        time.sleep(.5)
+        volts_process = subprocess.run([PATH, '-v'],
+                                       stdout=subprocess.PIPE, 
+                                       stderr=subprocess.PIPE)
+        volts = float(volts_process.stdout.decode('utf-8').strip()) / 1000
+        currentVoltsList.append(volts)
+        time.sleep(SLEEP_TIME)
 
     currentVolts = statistics.mean(currentVoltsList)
     return currentVolts
@@ -42,8 +44,13 @@ def checkAmps(j=3):
     """
     currentAmpsList = []
     for i in range(0, j):
-        currentAmpsList.append(ina.getCurrent_mA())
-        time.sleep(.5)
+        
+        amps_process = subprocess.run([PATH, '-c'],
+                                      stdout=subprocess.PIPE,
+                                      stderr=subprocess.PIPE)
+        amps = float(amps_process.stdout.decode('utf-8').strip())
+        currentAmpsList.append(amps)
+        time.sleep(SLEEP_TIME)
 
     currentAmps = statistics.mean(currentAmpsList)
     return currentAmps
