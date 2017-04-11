@@ -1,4 +1,4 @@
-FROM resin/beaglebone-python:3.5
+FROM resin/beaglebone-python:3.6
 
 RUN apt-get update
 RUN apt-get install -y \
@@ -35,4 +35,5 @@ RUN pip install --no-cache-dir -r /gage/gage-requirements.txt
 COPY app /gage
 
 CMD while : ; do echo "Idling..."; sleep ${INTERVAL=600}; done
+
 #CMD python simple.py
