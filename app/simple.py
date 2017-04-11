@@ -65,7 +65,7 @@ def clean_sample_mean(sample_func, low, high, min_samples, max_attempts, max_std
                         in cleaned_low_high 
                         if abs(statistics.mean(cleaned_low_high) - s) < 2 * statistics.stdev(cleaned_low_high)]
         except statistics.StatisticsError:
-            pass
+            cleaned = []
 
         if len(cleaned) >= min_samples:
             if statistics.stdev(cleaned) < max_std_dev:

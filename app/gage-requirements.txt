@@ -5,3 +5,4 @@ pyserial
 peewee
 ipython
 #netifaces
+python-networkmanager
