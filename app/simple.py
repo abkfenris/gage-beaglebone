@@ -6,6 +6,7 @@ import power
 # Sensor Sampling Environment Variables
 PORT = os.environ.get('GAGE_SERIAL_PORT', '/dev/ttyS2')
 UART = os.environ.get('GAGE_SERIAL_UART', 'UART2')
+STORAGE_MOUNT_PATH = os.environ.get('GAGE_STORAGE_MOUNT_PATH', '/mnt/gagedata')
 WAIT = int(os.environ.get('GAGE_SAMPLE_WAIT', 5))
 SENSOR_LOW = int(os.environ.get('GAGE_SENSOR_LOW', 501))
 SENSOR_HIGH = int(os.environ.get('GAGE_SENSOR_HIGH', 9998))
@@ -144,7 +145,29 @@ def sensor_cycle(ser):
         time.sleep(WAIT)
 
 
+def mount_data_sd(path):
+    """Mounts the microsd card for data storage at given path"""
+    try:
+        os.mkdir(path)
+    except OSError:
+        logger.info(f'{path} already exists. Storage should be mounted')
+    else:
+        logger.info(f'Created mount point for microsd at {path}')
+    
+    output = subprocess.run([f'mount {path}'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    if f"mount can't find {path} in /etc/fstab" in output.stderr.decode('ASCII'):
+        logger.error("/etc/fstab doesn't include mount {path}")
+    elif f'is already mounted on {path}' in output.stderr.decode('ASCII'):
+        logger.info(f'MicroSD storage already mounted at {path}')
+    else:
+        logger.info(f'MicroSD storage mounted at {path}')
+    
+
+
+    
+
 if __name__ == '__main__':
+    mount_data_sd(STORAGE_MOUNT_PATH)
     cell_setup()
     ser = serial_setup()
     if not POWER_CONSERVE:

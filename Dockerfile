@@ -32,6 +32,8 @@ WORKDIR /gage
 COPY /app/gage-requirements.txt /gage
 RUN pip install --no-cache-dir -r /gage/gage-requirements.txt
 
+RUN echo "LABEL=GAGEDATA /mnt/gagedata vfat defaults" >> /etc/fstab
+
 COPY app /gage
 
 #CMD while : ; do echo "Idling..."; sleep ${INTERVAL=600}; done
