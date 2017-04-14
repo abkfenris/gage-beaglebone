@@ -102,7 +102,7 @@ def shutdown():
             headers={'Content-Type': 'application/json'})
         try:
             if res.json()['Data'] != 'OK':
-                logger.error(f'Resin supervisor did not respond with "DATA":"OK". Response was: {res.json()')
+                logger.error(f'Resin supervisor did not respond with "DATA":"OK". Response was: {res.json()}')
             else:
                 logger.debug('Resin supervisor responded "OK" to reboot request')
         except KeyError:
