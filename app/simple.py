@@ -7,8 +7,10 @@ import power
 PORT = os.environ.get('GAGE_SERIAL_PORT', '/dev/ttyS2')
 UART = os.environ.get('GAGE_SERIAL_UART', 'UART2')
 STORAGE_MOUNT_PATH = os.environ.get('GAGE_STORAGE_MOUNT_PATH', '/mnt/gagedata')
-DATA_CSV_PATH = STORAGE_MOUNT_PATH + '/' + datetime.date.today().isoformat() + '.csv'
+DATA_CSV_FOLDER = os.environ.get('GAGE_DATA_CSV_FOLDER', STORAGE_MOUNT_PATH + '/logs/')
+MAX_LOG_FILES = int(os.environ.get('MAX_LOG_FILES', 3))
 WAIT = int(os.environ.get('GAGE_SAMPLE_WAIT', 5))
+
 SENSOR_LOW = int(os.environ.get('GAGE_SENSOR_LOW', 501))
 SENSOR_HIGH = int(os.environ.get('GAGE_SENSOR_HIGH', 9998))
 MIN_SAMPLES = int(os.environ.get('GAGE_MIN_SAMPLES', 10))
@@ -173,15 +175,29 @@ def mount_data_sd(path):
     
 
 
-
-
-
+def remove_old_log_files():
+    """Removes log files older than MAX_LOG_FILES"""
+    ordered = sorted((DATA_CSV_FOLDER + filename for filename in os.listdir(DATA_CSV_FOLDER)), key=os.path.getctime, reverse=True)
+    old = ordered[MAX_LOG_FILES:]
+    for path in old:
+        logger.info(f'Removing log {path} as there are more than MAX_LOG_FILES ({MAX_LOG_FILES}).')
+        os.remove(path)
     
 
 if __name__ == '__main__':
     mount_data_sd(STORAGE_MOUNT_PATH)
+    try:
+        os.mkdir(DATA_CSV_FOLDER)
+    except OSError:
+        logger.info(f'Log directory {DATA_CSV_FOLDER} already exists')
+    else:
+        logger.info(f'Created log directory {DATA_CSV_FOLDER}')
+    remove_old_log_files()
+    DATA_CSV_PATH = DATA_CSV_FOLDER + datetime.date.today().isoformat() + '.csv'
+
     cell_setup()
     ser = serial_setup()
+
     if not POWER_CONSERVE:
         while True:
             sensor_cycle(ser)
