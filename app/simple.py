@@ -1,4 +1,4 @@
-import time, datetime, os, logging, subprocess, sys, statistics
+import time, datetime, os, logging, subprocess, sys, statistics, csv
 import serial
 
 import power
@@ -7,6 +7,7 @@ import power
 PORT = os.environ.get('GAGE_SERIAL_PORT', '/dev/ttyS2')
 UART = os.environ.get('GAGE_SERIAL_UART', 'UART2')
 STORAGE_MOUNT_PATH = os.environ.get('GAGE_STORAGE_MOUNT_PATH', '/mnt/gagedata')
+DATA_CSV_PATH = STORAGE_MOUNT_PATH + '/' + datetime.date.today().isoformat() + '.csv'
 WAIT = int(os.environ.get('GAGE_SAMPLE_WAIT', 5))
 SENSOR_LOW = int(os.environ.get('GAGE_SENSOR_LOW', 501))
 SENSOR_HIGH = int(os.environ.get('GAGE_SENSOR_HIGH', 9998))
@@ -34,12 +35,19 @@ logger.addHandler(ch)
 class SensorError(Exception):
     pass
 
-
 class SamplingError(Exception):
     pass
 
 class TooFewSamples(SamplingError):
     pass
+
+
+def writerow(row):
+    """Write a row to the current csv file"""
+    with open(DATA_CSV_PATH, 'a') as f:
+        writer = csv.writer(f)
+        writer.writerow(row)
+
 
 def serial_setup():
     """ enable UART-2 device tree overlay in cape manager """
@@ -136,12 +144,13 @@ def sensor_cycle(ser):
         volts = round(power.checkVolts(), 2)
         amps = round(power.checkAmps(), 2)
         if amps < 0:
-            amps = f'charging {amps}'
+            flow = 'charging'
         elif amps < 2:
-            amps = f'float {amps}'
+            flow = 'float'
         else:
-            amps = f'discharging {amps}'
-        logger.info(f'{date} {distance}mm {volts}v {amps}ma')
+            flow = 'discharging'
+        logger.info(f'{date} {distance}mm {volts}v {flow} {amps}ma')
+        writerow((date, distance, 'mm ultrasound', volts, flow, amps))
         time.sleep(WAIT)
 
 
@@ -162,6 +171,9 @@ def mount_data_sd(path):
     else:
         logger.info(f'MicroSD storage mounted at {path}')
     
+
+
+
 
 
     
