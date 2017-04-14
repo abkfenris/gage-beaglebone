@@ -92,3 +92,22 @@ def reboot():
         logger.error('RESIN_SUPERVISOR_ADDRESS or RESIN_SUPERVISOR_API_KEY not in environment')
     logger.info('Setting powercape to cut power in 60 seconds if still running')
     set_wdt_stop(60) # cut power in 60 seconds if still running.
+
+def shutdown():
+    """
+    Send resin supervisor shutdown command"""
+    if RESIN_SUPERVISOR_ADDRESS and RESIN_SUPERVISOR_API_KEY:
+        res = requests.post(
+            f'{RESIN_SUPERVISOR_ADDRESS}/v1/shutdown?apikey={RESIN_SUPERVISOR_API_KEY}',
+            headers={'Content-Type': 'application/json'})
+        try:
+            if res.json()['Data'] != 'OK':
+                logger.error(f'Resin supervisor did not respond with "DATA":"OK". Response was: {res.json()')
+            else:
+                logger.debug('Resin supervisor responded "OK" to reboot request')
+        except KeyError:
+            logger.error('No "DATA" key in Resin supervisor response')
+    else:
+        logger.error('RESIN_SUPERVISOR_ADDRESS or RESIN_SUPERVISOR_API_KEY not in environment')
+    logger.info('Setting pwoercape to cut power in 60 seconds in still running')
+    set_wdt_stop(60)
