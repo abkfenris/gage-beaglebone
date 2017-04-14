@@ -84,9 +84,11 @@ def reboot():
         try:
             if res.json()['Data'] != 'OK':
                 logger.error(f'Resin supervisor did not respond with "Data":"OK" Response was: {res.json()}')
+            else:
+                logger.debug('Resin supervisor responded "OK" to reboot request')
         except KeyError:
             logger.error('No "Data" key in Resin supervisor response.')
     else:
         logger.error('RESIN_SUPERVISOR_ADDRESS or RESIN_SUPERVISOR_API_KEY not in environment')
-    finally:
-        set_wdt_stop(60) # cut power in 60 seconds if still running.
+    logger.info('Setting powercape to cut power in 60 seconds if still running')
+    set_wdt_stop(60) # cut power in 60 seconds if still running.
