@@ -1,8 +1,16 @@
 import os
+import requests
+import os
+import logging
+
 from Adafruit_I2C import Adafruit_I2C
+
+RESIN_SUPERVISOR_API_KEY = os.environ.get('RESIN_SUPERVISOR_API_KEY', None)
+RESIN_SUPERVISOR_ADDRESS = os.environ.get('RESIN_SUPERVISOR_ADDRESS', None)
 
 powercapeI2C = Adafruit_I2C(0x21, 2)
 
+logger = logging.getLogger(__name__)
 
 def set_time(cycle_time):
     """
@@ -63,3 +71,22 @@ def set_startup_reasons(startup_reasons):
         os.system('i2cset -y 2 0x21 4 {startup_reasons}'.format(startup_reasons=startup_reasons))
     except:
         pass
+
+
+def reboot():
+    """
+    Send resin supervisor reboot command
+    """
+    if RESIN_SUPERVISOR_ADDRESS and RESIN_SUPERVISOR_API_KEY:
+        res = requests.post(
+            f'{RESIN_SUPERVISOR_ADDRESS}/v1/reboot?apikey={RESIN_SUPERVISOR_API_KEY}', 
+            headers={'Content-Type': 'application/json'})
+        try:
+            if res.json()['Data'] != 'OK':
+                logger.error(f'Resin supervisor did not respond with "Data":"OK" Response was: {res.json()}')
+        except KeyError:
+            logger.error('No "Data" key in Resin supervisor response.')
+    else:
+        logger.error('RESIN_SUPERVISOR_ADDRESS or RESIN_SUPERVISOR_API_KEY not in environment')
+    finally:
+        set_wdt_stop(60) # cut power in 60 seconds if still running.
