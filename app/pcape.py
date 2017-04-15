@@ -1,7 +1,5 @@
-import os
+import os, logging, subprocess, datetime
 import requests
-import os
-import logging
 
 from Adafruit_I2C import Adafruit_I2C
 
@@ -105,7 +103,8 @@ def reboot():
 
 def shutdown():
     """
-    Send resin supervisor shutdown command"""
+    Send resin supervisor shutdown command
+    """
     if RESIN_SUPERVISOR_ADDRESS and RESIN_SUPERVISOR_API_KEY:
         res = requests.post(
             f'{RESIN_SUPERVISOR_ADDRESS}/v1/shutdown?apikey={RESIN_SUPERVISOR_API_KEY}',
@@ -121,3 +120,14 @@ def shutdown():
         logger.error('RESIN_SUPERVISOR_ADDRESS or RESIN_SUPERVISOR_API_KEY not in environment')
     logger.info('Setting powercape to cut power in 60 seconds in still running')
     set_wdt_stop(60)
+
+def cape_time():
+    """
+    Get the current time from the cape as a datetime object
+    """
+    output = subprocess.run(['/gage/PowerCape/utils/power -r'], 
+        stdout=subprocess.PIPE, 
+        stderr=subprocess.PIPE, 
+        shell=True)
+    time_str = output.stdout.decode('ASCII').strip()
+    return datetime.datetime.strptime(time_str, '%a %b %d %H:%M:%S %Y')
