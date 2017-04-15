@@ -20,7 +20,7 @@ def set_time(cycle_time):
     try:
         powercapeI2C.write8(7, cycle_time)
     except Exception:
-        pass
+        logger.error('Error setting startup time on PowerCape')
 
 
 def set_wdt_reset(cycle_time):
@@ -32,7 +32,7 @@ def set_wdt_reset(cycle_time):
     try:
         powercapeI2C.write8(18, cycle_time)
     except Exception:
-        pass
+        logger.error('Error setting restart timeout')
 
 
 def set_wdt_power(cycle_time):
@@ -40,23 +40,23 @@ def set_wdt_power(cycle_time):
     Timout in seconds before the PowerCape cuts power
     to the BeagleBone
     """
-    logger.info(f'Setting watchdog power cuttof time to {cycle_time} seconds.')
+    logger.info(f'Setting watchdog power cutoff time to {cycle_time} seconds.')
     try:
         powercapeI2C.write8(19, cycle_time)
     except Exception:
-        pass
+        logger.error('Error setting watchdog power cutoff timeout')
 
 
 def set_wdt_stop(cycle_time):
     """
-    Timeout in seconds and cut power 
-    (for Beaglebones that don't cut power)
+    Timeout in seconds and cut power  (for Beaglebones that 
+    don't cut power). Clears on shutdown.
     """
     logger.info(f'Setting watchdog power cuttof time to {cycle_time} seconds.')
     try:
         powercapeI2C.write8(20, cycle_time)
     except:
-        pass
+        logger.error('Error setting watchdog power cut timeout')
 
 
 def set_wdt_start(cycle_time):
@@ -68,7 +68,7 @@ def set_wdt_start(cycle_time):
     try:
         powercapeI2C.write8(21, cycle_time)
     except:
-        pass
+        logger.error('Error setting watchdog startup timeout')
 
 
 def set_startup_reasons(startup_reasons):
@@ -102,6 +102,7 @@ def reboot():
     logger.info('Setting powercape to cut power in 60 seconds if still running')
     set_wdt_stop(60) # cut power in 60 seconds if still running.
 
+
 def shutdown():
     """
     Send resin supervisor shutdown command
@@ -122,6 +123,7 @@ def shutdown():
     logger.info('Setting powercape to cut power in 60 seconds in still running')
     set_wdt_stop(60)
 
+
 def cape_time():
     """
     Get the current time from the cape as a datetime object
@@ -133,6 +135,7 @@ def cape_time():
     time_str = output.stdout.decode('ASCII').strip()
     return datetime.datetime.strptime(time_str, '%a %b %d %H:%M:%S %Y')
 
+
 def set_cape_time():
     """
     Set the PowerCape RTC from the system RTC
@@ -141,6 +144,7 @@ def set_cape_time():
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         shell=True)
+
 
 def set_system_time():
     """

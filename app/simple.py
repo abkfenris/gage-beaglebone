@@ -14,6 +14,7 @@ WAIT = int(os.environ.get('GAGE_SAMPLE_WAIT', 5))
 MIN_VOLTAGE = float(os.environ.get('GAGE_MIN_VOLTAGE', 3.2))
 CELL_TYPE = os.environ.get('GAGE_CELL_TYPE', 'ting-sierra-250u')
 SAMPLES_PER_RUN = int(os.environ.get('GAGE_SAMPLES_PER_RUN', 5))
+PRE_SHUTDOWN_TIME = int(os.environ.get('GAGE_PRE_SHUTDOWN_TIME', 60))
 
 SENSOR_LOW = int(os.environ.get('GAGE_SENSOR_LOW', 501))
 SENSOR_HIGH = int(os.environ.get('GAGE_SENSOR_HIGH', 9998))
@@ -196,7 +197,7 @@ if __name__ == '__main__':
         for n in range(SAMPLES_PER_RUN):
             sensor_cycle(ser)
         
-
+        time.sleep(PRE_SHUTDOWN_TIME) # give some time to breath!
         pcape.set_cape_time()
         pcape.set_time(RESTART_TIME)
 
