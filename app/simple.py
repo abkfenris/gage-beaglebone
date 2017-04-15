@@ -2,6 +2,7 @@ import time, datetime, os, logging, subprocess, sys, statistics, csv
 import serial
 
 import power
+from cell import sprint
 
 # Sensor Sampling Environment Variables
 PORT = os.environ.get('GAGE_SERIAL_PORT', '/dev/ttyS2')
@@ -66,32 +67,6 @@ def serial_setup():
         logger.info(f'{UART} added to capemgr')
     ser = serial.Serial(port=PORT, baudrate=9600, bytesize=8, parity='N', stopbits=1)
     return ser
-
-def cell_setup():
-    """ Loads kernel modules and cycles USB bus to enumerate cell modem """
-    output = subprocess.run(['lsusb'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-    # If the module isn't detected
-    if 'Sierra' not in output.stdout.decode('ASCII'):
-        # load kernel modules
-        output = subprocess.run(['modprobe sierra'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        output = subprocess.run(['modprobe sierra_net'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-
-        # cycle USB bus
-        output = subprocess.run(
-            ['sh -c "echo 0 > /sys/bus/usb/devices/1-1/authorized"'],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        output = subprocess.run(
-            ['sh -c "echo 1 > /sys/bus/usb/devices/1-1/authorized"'],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
-        )
-        output = subprocess.run(['lsusb'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        if 'Sierra' in output.stdout.decode('ASCII'):
-            logger.info('Sierra Cell Modem USB kernel drivers loaded and modem detected')
-        else:
-            logger.error('Unable to load Sierra Cell Modem kernel drivers')
-    else:
-        logger.info('Sierra Cell Modem USB kernel drivers already loaded and modem detected')
 
 
 def read_serial(ser):
@@ -197,7 +172,8 @@ if __name__ == '__main__':
     remove_old_log_files()
     DATA_CSV_PATH = DATA_CSV_FOLDER + datetime.date.today().isoformat() + '.csv'
 
-    cell_setup()
+    sprint.Sierra250U()
+
     ser = serial_setup()
 
     if not POWER_CONSERVE:
