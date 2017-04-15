@@ -167,8 +167,8 @@ def remove_old_log_files():
 if __name__ == '__main__':
     #if POWER_CONSERVE:
     #    pcape.set_wdt_power(WATCHDOG_POWER_TIMEOUT)
-
     
+    pcape.set_system_time()
 
     # setup cell
     sprint.Sierra250U()
@@ -212,6 +212,8 @@ if __name__ == '__main__':
                 time.sleep(15)
                 if not pcape.update_in_progress():
                     break
+        else:
+            logger.info('No update scheduled, getting ready to shutdown')
 
         logger.info('Powercape info:')
         for line in pcape.powercape_info():

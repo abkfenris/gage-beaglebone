@@ -154,8 +154,9 @@ def cape_time():
 
 def set_cape_time():
     """
-    Set the PowerCape RTC from the system RTC
+    Set the PowerCape RTC from the system clock
     """
+    logger.info('Setting Powercape RTC from system clock')
     output = subprocess.run([POWERCAPE_PATH + ' -w'],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -166,6 +167,7 @@ def set_system_time():
     """
     Set the system time from the PowerCape RTC
     """
+    logger.info('Setting system time from PowerCape RTC')
     output = subprocess.run([POWERCAPE_PATH + ' -s'],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
