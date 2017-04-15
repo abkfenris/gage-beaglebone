@@ -93,7 +93,7 @@ def set_startup_reasons(startup_reasons):
     """
     logger.info(f'Setting startup reason {startup_reasons}  ({startup_reasoner(startup_reasons)})')
     try:
-        os.system('i2cset -y 2 0x21 4 {startup_reasons}'.format(startup_reasons=startup_reasons))
+        os.system(f'i2cset -y 2 0x21 4 {startup_reasons}')
     except:
         pass
 

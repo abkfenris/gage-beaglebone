@@ -13,7 +13,7 @@ MAX_LOG_FILES = int(os.environ.get('MAX_LOG_FILES', 3))
 WAIT = int(os.environ.get('GAGE_SAMPLE_WAIT', 5))
 MIN_VOLTAGE = float(os.environ.get('GAGE_MIN_VOLTAGE', 3.2))
 CELL_TYPE = os.environ.get('GAGE_CELL_TYPE', 'ting-sierra-250u')
-SAMPLES_PER_RUN = int(os.environ.get('GAGE_SAMPLES_PER_RUN', 5))
+SAMPLES_PER_RUN = int(os.environ.get('GAGE_SAMPLES_PER_RUN', 10))
 PRE_SHUTDOWN_TIME = int(os.environ.get('GAGE_PRE_SHUTDOWN_TIME', 60))
 
 SENSOR_LOW = int(os.environ.get('GAGE_SENSOR_LOW', 501))
@@ -164,8 +164,8 @@ def remove_old_log_files():
     
 
 if __name__ == '__main__':
-    if POWER_CONSERVE:
-        pcape.set_wdt_power(WATCHDOG_POWER_TIMEOUT)
+    #if POWER_CONSERVE:
+    #    pcape.set_wdt_power(WATCHDOG_POWER_TIMEOUT)
 
     
 
@@ -200,7 +200,7 @@ if __name__ == '__main__':
         logger.info(f'Sleeping for {PRE_SHUTDOWN_TIME} seconds to allow communication.')
         time.sleep(PRE_SHUTDOWN_TIME)
 
-        #pcape.set_cape_time()
+        pcape.set_cape_time()
         #pcape.set_time(RESTART_TIME)
         #pcape.set_wdt_start(WATCHDOG_START_POWER_TIMEOUT)
-        #pcape.shutdown()
+        pcape.shutdown()
