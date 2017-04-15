@@ -14,8 +14,10 @@ logger = logging.getLogger('gage')
 
 def set_time(cycle_time):
     """
-    Set time till start in min
+    Set time in minutes that the PowerCape will wait
+    to start the BeagleBone up after shutdown.
     """
+    logger.info(f'Setting startup time for {cycle_time} minutes.')
     try:
         powercapeI2C.write8(7, cycle_time)
     except Exception:
@@ -24,8 +26,10 @@ def set_time(cycle_time):
 
 def set_wdt_reset(cycle_time):
     """
-    Timeout in seconds and send SYS_RESET
+    Timeout in seconds before the PowerCape attempts to 
+    restart the BeagleBone by sending SYS_RESET
     """
+    logger.info(f'Setting watchdog force reset time to {cycle_time} seconds.')
     try:
         powercapeI2C.write8(18, cycle_time)
     except Exception:
@@ -34,8 +38,10 @@ def set_wdt_reset(cycle_time):
 
 def set_wdt_power(cycle_time):
     """
-    Timout in seconds and cut power
+    Timout in seconds before the PowerCape cuts power
+    to the BeagleBone
     """
+    logger.info(f'Setting watchdog power cuttof time to {cycle_time} seconds.')
     try:
         powercapeI2C.write8(19, cycle_time)
     except Exception:
@@ -44,8 +50,10 @@ def set_wdt_power(cycle_time):
 
 def set_wdt_stop(cycle_time):
     """
-    Timeout in seconds and cut power (for Beaglebones that don't cut power)
+    Timeout in seconds and cut power 
+    (for Beaglebones that don't cut power)
     """
+    logger.info(f'Setting watchdog power cuttof time to {cycle_time} seconds.')
     try:
         powercapeI2C.write8(20, cycle_time)
     except:
@@ -57,6 +65,7 @@ def set_wdt_start(cycle_time):
     Startup timeout in seconds. If I2C activity hasn't been seen on startup
     after this time then it will cycle power on timeout.
     """
+    logger.info(f'Setting watchdog startup activity time to {cycle_time} seconds before power cycle.')
     try:
         powercapeI2C.write8(21, cycle_time)
     except:
@@ -110,5 +119,5 @@ def shutdown():
             logger.error('No "DATA" key in Resin supervisor response')
     else:
         logger.error('RESIN_SUPERVISOR_ADDRESS or RESIN_SUPERVISOR_API_KEY not in environment')
-    logger.info('Setting pwoercape to cut power in 60 seconds in still running')
+    logger.info('Setting powercape to cut power in 60 seconds in still running')
     set_wdt_stop(60)

@@ -27,7 +27,7 @@ RESTART_TIME = int(os.environ.get('GAGE_RESTART_TIME', 14))
 WATCHDOG_RESET_TIMEOUT = int(os.environ.get('GAGE_WATCHDOG_RESET_TIMEOUT', 300))
 WATCHDOG_POWER_TIMEOUT = int(os.environ.get('GAGE_WATCHDOG_POWER_TIMEOUT', 300))
 WATCHDOG_STOP_POWER_TIMEOUT = int(os.environ.get('GAGE_WATCHDOG_STOP_POWER_TIMEOUT', 300))
-WATCHDOG_START_POWER_TIMEOUT = int(os.environ.get('GAGE_WATCHDOG_START_POWER_TIMEOUT', 300))
+WATCHDOG_START_POWER_TIMEOUT = int(os.environ.get('GAGE_WATCHDOG_START_POWER_TIMEOUT', 60))
 STARTUP_REASONS = os.environ.get('GAGE_STARTUP_REASONS', '0x09')
 
 
@@ -164,6 +164,8 @@ def remove_old_log_files():
 if __name__ == '__main__':
     if POWER_CONSERVE:
         pcape.set_wdt_power(WATCHDOG_POWER_TIMEOUT)
+
+    pcape.set_wdt_start(WATCHDOG_START_POWER_TIMEOUT)
 
     # setup cell
     sprint.Sierra250U()
