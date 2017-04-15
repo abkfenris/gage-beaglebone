@@ -205,7 +205,7 @@ if __name__ == '__main__':
         #pcape.set_time(WATCHDOG_START_POWER_TIMEOUT)
 
         if pcape.update_in_progress():
-            for x in range(MAX_UPDATE_WAIT / 15):
+            for x in range(MAX_UPDATE_WAIT // 15):
                 logger.info(f'Update in progress: {pcape.update_percent()}%. Giving it {MAX_UPDATE_WAIT} more seconds.')
                 MAX_UPDATE_WAIT -= 15
                 time.sleep(15)
