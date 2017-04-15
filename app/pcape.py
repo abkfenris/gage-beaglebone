@@ -170,3 +170,15 @@ def set_system_time():
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         shell=True)
+
+
+def powercape_info():
+    """
+    Return lines from powercape information
+    """
+    output = output = subprocess.run([POWERCAPE_PATH + ' -i'], 
+        stdout=subprocess.PIPE, 
+        stderr=subprocess.PIPE, 
+        shell=True)
+    
+    return output.stdout.decode('ASCII').splitlines()

@@ -201,6 +201,9 @@ if __name__ == '__main__':
         time.sleep(PRE_SHUTDOWN_TIME)
 
         pcape.set_cape_time()
-        #pcape.set_time(RESTART_TIME)
-        #pcape.set_wdt_start(WATCHDOG_START_POWER_TIMEOUT)
+        pcape.set_time(RESTART_TIME)
+        #pcape.set_time(WATCHDOG_START_POWER_TIMEOUT)
+        logger.info('Powercape info')
+        for line in pcape.powercape_info():
+            logger.info(line)
         pcape.shutdown()
