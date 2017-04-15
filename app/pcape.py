@@ -71,11 +71,27 @@ def set_wdt_start(cycle_time):
         logger.error('Error setting watchdog startup timeout')
 
 
+def startup_reasoner(hex_string):
+    hex_value = int(hex_string, 16)
+    output = []
+    if hex_value // 8 == 1:
+        output.append('startup timeout completes')
+        hex_value -= 8
+    if hex_value // 4 == 1:
+        output.append('good DC power detected')
+        hex_value -= 4
+    if hex_value // 2 == 1:
+        output.append('external button press')
+        hex_value -= 2
+    if hex_value // 1 == 1:
+        output.append('PowerCape button press')
+    return ', '.join(output)
+
 def set_startup_reasons(startup_reasons):
     """
     Set startup reason for powercape
     """
-    logger.info(f'Setting startup reason {startup_reasons}')
+    logger.info(f'Setting startup reason {startup_reasons}  ({startup_reasoner(startup_reasons)})')
     try:
         os.system('i2cset -y 2 0x21 4 {startup_reasons}'.format(startup_reasons=startup_reasons))
     except:
