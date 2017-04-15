@@ -1,12 +1,6 @@
-import os
-import time
-
-import netifaces
+import dbus
 
 from cell import CellConnection
-from utils import TimeoutError
-
-SPRINT_PATH = os.path.dirname(__file__)
 
 
 class Sierra250U(CellConnection):
@@ -17,31 +11,37 @@ class Sierra250U(CellConnection):
     scripts from https://sites.google.com/site/cellularbeaglebone/
     """
 
-    def __enter__(self):
-        # find the usb device for the cell modem
-        os.system('ifup ppp0')
-        for x in range(10):
-            if 'ppp0' in netifaces.interfaces():
-                break
-            time.sleep(6)
-        else:
-            raise TimeoutError('Unable to dial a cell connection')
+    uuid = '02d5e625-86a7-448e-8880-91e0977ad4e5'
+    nm_id = 'ting-sierra-250u'
 
-    def __exit__(self, exc_type, exc_value, traceback):
-        # Try to turn off ppp
-        os.system('ifdown ppp0')
+s_con = dbus.Dictionary({
+    'type': 'cdma',
+    'uuid': '02d5e625-86a7-448e-8880-91e0977ad4e5',
+    'autoconnect': True,
+    'id': 'ting-sierra-250u'})
 
-    def install(self):
-        """
-        Install the required goodies using fabric
-        """
-        from fabric.api import cd
-        from fabric.contrib.files import append
-        from fabtools import require
-        with cd('/etc'):
-            require.file('wvdial.conf',
-                         source='cell/sprint/sierra250u/config_files/wvdial.conf',
-                         use_sudo=True)
-        append('/etc/network/interfaces',
-               'iface ppp0 inet wvdial',
-               use_sudo=True)
+s_ipv4 = dbus.Dictionary({
+    'method': 'auto'})
+
+s_serial = dbus.Dictionary({
+    'baud': 921600})
+
+s_cdma = dbus.Dictionary({
+    'number': '#777'
+})
+
+s_ipv6 = dbus.Dictionary({
+    'method': 'auto'})
+
+con = dbus.Dictionary({
+    'connection': s_con,
+    'cdma': s_cdma,
+    'ipv4': s_ipv4,
+    #'ipv6': s_ipv6,
+    'serial': s_serial})
+
+bus = dbus.SystemBus()
+proxy = bus.get_object("org.freedesktop.NetworkManager", 
+    "/org/freedesktop/NetworkManager/Settings")
+settings = dbus.Interface(proxy, "org.freedesktop.NetworkManager.Settings")
+settings.AddConnection(con)
