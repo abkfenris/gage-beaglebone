@@ -76,4 +76,6 @@ class Sierra250U(CellConnection):
             settings = dbus.Interface(proxy, "org.freedesktop.NetworkManager.Settings")
             settings.AddConnection(con)
             if nm_id in list_connection_ids():
-                logger.info('Sucessfully added connection for {nm_id}')
+                logger.info(f'Sucessfully added connection for {nm_id}')
+        else:
+            logger.info(f'{nm_id} already in list of NetworkManager connections')
