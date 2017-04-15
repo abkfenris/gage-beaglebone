@@ -5,6 +5,7 @@ from Adafruit_I2C import Adafruit_I2C
 
 RESIN_SUPERVISOR_API_KEY = os.environ.get('RESIN_SUPERVISOR_API_KEY', None)
 RESIN_SUPERVISOR_ADDRESS = os.environ.get('RESIN_SUPERVISOR_ADDRESS', None)
+POWERCAPE_PATH = '/gage/PowerCape/utils/power'
 
 powercapeI2C = Adafruit_I2C(0x21, 2)
 
@@ -125,9 +126,27 @@ def cape_time():
     """
     Get the current time from the cape as a datetime object
     """
-    output = subprocess.run(['/gage/PowerCape/utils/power -r'], 
+    output = subprocess.run([POWERCAPE_PATH + ' -r'], 
         stdout=subprocess.PIPE, 
         stderr=subprocess.PIPE, 
         shell=True)
     time_str = output.stdout.decode('ASCII').strip()
     return datetime.datetime.strptime(time_str, '%a %b %d %H:%M:%S %Y')
+
+def set_cape_time():
+    """
+    Set the PowerCape RTC from the system RTC
+    """
+    output = subprocess.run([POWERCAPE_PATH + ' -w'],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        shell=True)
+
+def set_system_time():
+    """
+    Set the system time from the PowerCape RTC
+    """
+    output = subprocess.run([POWERCAPE_PATH + ' -s'],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        shell=True)
