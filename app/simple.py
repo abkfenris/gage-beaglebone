@@ -203,7 +203,8 @@ if __name__ == '__main__':
         pcape.set_cape_time()
         pcape.set_time(RESTART_TIME)
         #pcape.set_time(WATCHDOG_START_POWER_TIMEOUT)
-        logger.info('Powercape info')
+        pcape.update_in_progress()
+        logger.info('Powercape info:')
         for line in pcape.powercape_info():
-            logger.info(line)
+            logger.info('   ' + line)
         pcape.shutdown()

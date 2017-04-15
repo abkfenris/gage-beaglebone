@@ -182,3 +182,16 @@ def powercape_info():
         shell=True)
     
     return output.stdout.decode('ASCII').splitlines()
+
+
+def update_in_progress():
+    """
+    Returns true if the resin supervisor is in the process
+    of downloading an update
+    """
+    if RESIN_SUPERVISOR_ADDRESS and RESIN_SUPERVISOR_API_KEY:
+        res = requests.get(f'{RESIN_SUPERVISOR_ADDRESS}/v1/device?apikey={RESIN_SUPERVISOR_API_KEY}',
+            headers={'Content-Type': 'application/json'})
+        logger.info(res.json())
+    else:
+        logger.error('RESIN_SUPERVISOR ADDRESS or RESIN_SUPERVISOR_API_KEY not set')
