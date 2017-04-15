@@ -201,8 +201,7 @@ if __name__ == '__main__':
         logger.info(f'Sleeping for {PRE_SHUTDOWN_TIME} seconds to allow communication.')
         time.sleep(PRE_SHUTDOWN_TIME)
 
-        pcape.set_cape_time()
-        pcape.set_time(RESTART_TIME)
+        
         #pcape.set_time(WATCHDOG_START_POWER_TIMEOUT)
 
         if pcape.update_in_progress():
@@ -214,6 +213,9 @@ if __name__ == '__main__':
                     break
         else:
             logger.info('No update scheduled, getting ready to shutdown')
+
+        pcape.set_cape_time()
+        pcape.set_time(RESTART_TIME)
 
         logger.info('Powercape info:')
         for line in pcape.powercape_info():
