@@ -167,7 +167,7 @@ if __name__ == '__main__':
     if POWER_CONSERVE:
         pcape.set_wdt_power(WATCHDOG_POWER_TIMEOUT)
 
-    pcape.set_wdt_start(WATCHDOG_START_POWER_TIMEOUT)
+    
 
     # setup cell
     sprint.Sierra250U()
@@ -197,8 +197,10 @@ if __name__ == '__main__':
         for n in range(SAMPLES_PER_RUN):
             sensor_cycle(ser)
         
-        time.sleep(PRE_SHUTDOWN_TIME) # give some time to breath!
+        logger.info(f'Sleeping for {PRE_SHUTDOWN_TIME} seconds to allow communication.')
+        time.sleep(PRE_SHUTDOWN_TIME)
+        
         pcape.set_cape_time()
         pcape.set_time(RESTART_TIME)
-
+        pcape.set_wdt_start(WATCHDOG_START_POWER_TIMEOUT)
         pcape.shutdown()
