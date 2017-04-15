@@ -15,6 +15,7 @@ MIN_VOLTAGE = float(os.environ.get('GAGE_MIN_VOLTAGE', 3.2))
 CELL_TYPE = os.environ.get('GAGE_CELL_TYPE', 'ting-sierra-250u')
 SAMPLES_PER_RUN = int(os.environ.get('GAGE_SAMPLES_PER_RUN', 10))
 PRE_SHUTDOWN_TIME = int(os.environ.get('GAGE_PRE_SHUTDOWN_TIME', 60))
+MAX_UPDATE_WAIT = int(os.environ.get('GAGE_MAX_UPDATE_WAIT', 300))
 
 SENSOR_LOW = int(os.environ.get('GAGE_SENSOR_LOW', 501))
 SENSOR_HIGH = int(os.environ.get('GAGE_SENSOR_HIGH', 9998))
@@ -203,8 +204,17 @@ if __name__ == '__main__':
         pcape.set_cape_time()
         pcape.set_time(RESTART_TIME)
         #pcape.set_time(WATCHDOG_START_POWER_TIMEOUT)
-        pcape.update_in_progress()
+
+        if pcape.update_in_progress():
+            for x in range(MAX_UPDATE_WAIT / 15):
+                logger.info(f'Update in progress: {pcape.update_percent()}%. Giving it {MAX_UPDATE_WAIT} more seconds.')
+                MAX_UPDATE_WAIT -= 15
+                time.sleep(15)
+                if not pcape.update_in_progress():
+                    break
+
         logger.info('Powercape info:')
         for line in pcape.powercape_info():
             logger.info('   ' + line)
+
         pcape.shutdown()

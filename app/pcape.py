@@ -192,6 +192,24 @@ def update_in_progress():
     if RESIN_SUPERVISOR_ADDRESS and RESIN_SUPERVISOR_API_KEY:
         res = requests.get(f'{RESIN_SUPERVISOR_ADDRESS}/v1/device?apikey={RESIN_SUPERVISOR_API_KEY}',
             headers={'Content-Type': 'application/json'})
-        logger.info(res.json())
+        try:
+            return res.json()['status'] == 'Downloading' or res.json()['update_pending'] or res.json()['update_downloaded']
+        except KeyError:
+            logger.error('Unknown response from Resin supervisor')
+    else:
+        logger.error('RESIN_SUPERVISOR ADDRESS or RESIN_SUPERVISOR_API_KEY not set')
+
+
+def update_percentage():
+    """
+    Returns percent of update downloaded
+    """
+    if RESIN_SUPERVISOR_ADDRESS and RESIN_SUPERVISOR_API_KEY:
+        res = requests.get(f'{RESIN_SUPERVISOR_ADDRESS}/v1/device?apikey={RESIN_SUPERVISOR_API_KEY}',
+            headers={'Content-Type': 'application/json'})
+        try:
+            return res.json()['download_progress']
+        except KeyError:
+            logger.error('Unknown response from Resin supervisor')
     else:
         logger.error('RESIN_SUPERVISOR ADDRESS or RESIN_SUPERVISOR_API_KEY not set')
