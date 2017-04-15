@@ -10,11 +10,11 @@ RESIN_SUPERVISOR_ADDRESS = os.environ.get('RESIN_SUPERVISOR_ADDRESS', None)
 
 powercapeI2C = Adafruit_I2C(0x21, 2)
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('gage')
 
 def set_time(cycle_time):
     """
-    Set time till restart
+    Set time till start in min
     """
     try:
         powercapeI2C.write8(7, cycle_time)
@@ -67,6 +67,7 @@ def set_startup_reasons(startup_reasons):
     """
     Set startup reason for powercape
     """
+    logger.info(f'Setting startup reason {startup_reasons}')
     try:
         os.system('i2cset -y 2 0x21 4 {startup_reasons}'.format(startup_reasons=startup_reasons))
     except:

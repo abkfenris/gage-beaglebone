@@ -5,7 +5,7 @@ import dbus
 from cell import CellConnection, list_connection_ids
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('gage')
 
 class Sierra250U(CellConnection):
     """
