@@ -14,7 +14,7 @@ WAIT = int(os.environ.get('GAGE_SAMPLE_WAIT', 5))
 MIN_VOLTAGE = float(os.environ.get('GAGE_MIN_VOLTAGE', 3.2))
 CELL_TYPE = os.environ.get('GAGE_CELL_TYPE', 'ting-sierra-250u')
 SAMPLES_PER_RUN = int(os.environ.get('GAGE_SAMPLES_PER_RUN', 10))
-PRE_SHUTDOWN_TIME = int(os.environ.get('GAGE_PRE_SHUTDOWN_TIME', 60))
+PRE_SHUTDOWN_TIME = int(os.environ.get('GAGE_PRE_SHUTDOWN_TIME', 30))
 MAX_UPDATE_WAIT = int(os.environ.get('GAGE_MAX_UPDATE_WAIT', 300))
 
 SENSOR_LOW = int(os.environ.get('GAGE_SENSOR_LOW', 501))
@@ -143,7 +143,7 @@ def mount_data_sd(path):
     except OSError:
         logger.info(f'{path} already exists. Storage should be mounted')
     else:
-        logger.info(f'Created mount point for microsd at {path}')
+        logger.info(f'Created mount point for microSD at {path}')
     
     output = subprocess.run([f'mount {path}'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     if f"mount can't find {path} in /etc/fstab" in output.stderr.decode('ASCII'):
@@ -184,9 +184,6 @@ if __name__ == '__main__':
     remove_old_log_files()
     DATA_CSV_PATH = DATA_CSV_FOLDER + datetime.date.today().isoformat() + '.csv'
 
-    # set startup reasons
-    pcape.set_startup_reasons(STARTUP_REASONS)
-
     # setup serial
     ser = serial_setup()
 
@@ -198,8 +195,9 @@ if __name__ == '__main__':
         for n in range(SAMPLES_PER_RUN):
             sensor_cycle(ser)
         
-        logger.info(f'Sleeping for {PRE_SHUTDOWN_TIME} seconds to allow communication.')
-        time.sleep(PRE_SHUTDOWN_TIME)
+        logger.info(f'Sensing for {PRE_SHUTDOWN_TIME} more seconds to allow communication.')
+        for n in range(PRE_SHUTDOWN_TIME // WAIT):
+            sensor_cycle(ser)
 
         
         #pcape.set_time(WATCHDOG_START_POWER_TIMEOUT)
@@ -214,6 +212,9 @@ if __name__ == '__main__':
         else:
             logger.info('No update scheduled, getting ready to shutdown')
 
+        
+        # set startup reasons
+        pcape.set_startup_reasons(STARTUP_REASONS)
         pcape.set_cape_time()
         pcape.set_time(RESTART_TIME)
 
