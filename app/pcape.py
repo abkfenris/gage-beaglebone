@@ -198,8 +198,13 @@ def update_in_progress():
             return res.json()['status'] == 'Downloading' or res.json()['update_pending'] or res.json()['update_downloaded']
         except KeyError:
             logger.error('Unknown response from Resin supervisor')
+            return False
+        except requests.exceptions.ConnectionError:
+            logger.error('Supervisor offline. Gage most likely does not have a connection')
+            return False
     else:
         logger.error('RESIN_SUPERVISOR ADDRESS or RESIN_SUPERVISOR_API_KEY not set')
+        return False
 
 
 def update_percentage():
