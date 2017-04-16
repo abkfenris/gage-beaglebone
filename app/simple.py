@@ -1,7 +1,7 @@
 import time, datetime, os, logging, subprocess, sys, statistics, csv
 import serial
 
-import power, pcape
+import power, pcape, supervisor
 from cell import sprint
 
 # Sensor Sampling Environment Variables
@@ -222,4 +222,4 @@ if __name__ == '__main__':
         for line in pcape.powercape_info():
             logger.info('   ' + line)
 
-        pcape.shutdown()
+        supervisor.shutdown()
