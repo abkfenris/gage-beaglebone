@@ -204,7 +204,7 @@ if __name__ == '__main__':
 
         if pcape.update_in_progress():
             for x in range(MAX_UPDATE_WAIT // WAIT):
-                logger.info(f'Update in progress: {pcape.update_percent()}%. Giving it {MAX_UPDATE_WAIT} more seconds.')
+                logger.info(f'Update in progress: {pcape.update_percentage()}%. Giving it {MAX_UPDATE_WAIT} more seconds.')
                 MAX_UPDATE_WAIT -= WAIT
                 sensor_cycle(ser)
                 if not pcape.update_in_progress():
