@@ -40,7 +40,7 @@ class Sierra250U(CellConnection):
             logger.info('Sierra Cell Modem USB kernel drivers already loaded and modem detected')
 
         uuid = '02d5e625-86a7-448e-8880-91e0977ad4e5'
-        nm_id = 'ting-sierra-250u'
+        nm_id = 'ting'
 
         if nm_id not in list_connection_ids():
             logger.info(f'{nm_id} not found in NetworkManager connections. Attempting to add')
