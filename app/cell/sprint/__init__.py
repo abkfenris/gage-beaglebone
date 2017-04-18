@@ -71,7 +71,8 @@ class Sierra250U(CellConnection):
                 'cdma': s_cdma,
                 'ipv4': s_ipv4,
                 'ppp': s_ppp,
-                'serial': s_serial})
+                #'serial': s_serial
+                })
 
             bus = dbus.SystemBus()
             proxy = bus.get_object("org.freedesktop.NetworkManager", 
