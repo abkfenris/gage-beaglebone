@@ -59,6 +59,9 @@ class Sierra250U(CellConnection):
             s_cdma = dbus.Dictionary({
                 'number': '#777'
             })
+            s_ppp = dbus.Dictionary({
+                'baud': 460800
+            })
 
             s_ipv6 = dbus.Dictionary({
                 'method': 'auto'})
@@ -67,7 +70,7 @@ class Sierra250U(CellConnection):
                 'connection': s_con,
                 'cdma': s_cdma,
                 'ipv4': s_ipv4,
-                #'ipv6': s_ipv6,
+                'ppp': s_ppp,
                 'serial': s_serial})
 
             bus = dbus.SystemBus()
