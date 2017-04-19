@@ -1,7 +1,7 @@
 import time, datetime, os, logging, subprocess, sys, statistics, csv
 import serial
 
-import power, pcape, supervisor
+import power, pcape, supervisor, cell
 from cell import sprint
 
 # Sensor Sampling Environment Variables
@@ -125,14 +125,17 @@ def sensor_cycle(ser):
         date = datetime.datetime.now()
         volts = round(power.checkVolts(), 2)
         amps = round(power.checkAmps(), 2)
+
         if amps < 0:
             flow = 'charging'
         elif amps < 2:
             flow = 'float'
         else:
             flow = 'discharging'
+
         logger.info(f'{date} {distance}mm {volts}v {flow} {amps}ma')
         writerow((date, distance, 'mm ultrasound', volts, flow, amps))
+
         time.sleep(WAIT)
 
 
@@ -190,6 +193,9 @@ if __name__ == '__main__':
     if not POWER_CONSERVE:
         while True:
             sensor_cycle(ser)
+
+            for conn in cell.list_active_connections:
+                logger.info('  ' + conn)
     
     else:
         for n in range(SAMPLES_PER_RUN):
@@ -198,6 +204,9 @@ if __name__ == '__main__':
         logger.info(f'Sensing for {PRE_SHUTDOWN_TIME} more seconds to allow communication.')
         for n in range(PRE_SHUTDOWN_TIME // WAIT):
             sensor_cycle(ser)
+
+            for conn in cell.list_active_connections:
+                logger.info('  ' + conn)    
 
         
         #pcape.set_time(WATCHDOG_START_POWER_TIMEOUT)

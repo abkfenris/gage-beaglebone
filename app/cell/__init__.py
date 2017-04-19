@@ -21,3 +21,12 @@ class CellConnection(object):
 def list_connection_ids():
     """Returns a list of the ids of current connections"""
     return [con.GetSettings()['connection']['id'] for con in NetworkManager.Settings.ListConnections()]
+
+
+def list_active_connections():
+    """Returns a list of active connection names and IP addresses"""
+    return [conn.Id + ' - ' + ','.join([address['address'] 
+                                        for address 
+                                        in conn.Ip4Config.AddressData]) 
+            for conn 
+            in NetworkManager.NetworkManager.ActiveConnections]

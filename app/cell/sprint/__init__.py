@@ -1,6 +1,7 @@
-import logging, subprocess
+import logging, subprocess, time
 
-import dbus
+# import dbus
+import NetworkManager
 
 from cell import CellConnection, list_connection_ids
 
@@ -15,6 +16,33 @@ class Sierra250U(CellConnection):
     scripts from https://sites.google.com/site/cellularbeaglebone/
     """
     def __init__(self):
+        uuid = '7fb0575b-64f9-4ff0-8820-637b9cbe54b3'
+        nm_id = 'ting'
+
+        if nm_id in [conn.Id for conn in NetworkManager.NetworkManager.ActiveConnections()]:
+            logger.info('ting connection currently active. Leaving it alone')
+        else:
+            for conn in NetworkManager.Settings.ListConnections():
+                if nm_id == conn.GetSettings()['connection']['id']:
+                    conn.Delete()
+                    logger.info('Deleted old Network Manager connection for ting')
+            ting_conn = {
+                'connection': {'id': nm_id,
+                            'type': 'cdma',
+                            'autoconnect': True,
+                            'autoconnect-priority': 0,
+                            'uuid': uuid},
+                'cdma': {'number': '#777'},
+                'ppp': {'baud': 460800},
+                'ipv4': {'method': 'auto'},
+                'ipv6': {'method': 'auto'}
+            }
+            NetworkManager.Settings.AddConnection(ting_conn)
+            logger.info('Added Network Manager connection for ting.')
+        
+
+        
+        
         output = subprocess.run(['lsusb'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         # If the module isn't detected
@@ -23,63 +51,21 @@ class Sierra250U(CellConnection):
             output = subprocess.run(['modprobe sierra'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
             output = subprocess.run(['modprobe sierra_net'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 
+            time.sleep(1)
             # cycle USB bus
             output = subprocess.run(
                 ['sh -c "echo 0 > /sys/bus/usb/devices/1-1/authorized"'],
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+            time.sleep(1)
             output = subprocess.run(
                 ['sh -c "echo 1 > /sys/bus/usb/devices/1-1/authorized"'],
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
             )
+            time.sleep(5)
             output = subprocess.run(['lsusb'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             if 'Sierra' in output.stdout.decode('ASCII'):
-                logger.info('Sierra Cell Modem USB kernel drivers loaded and modem detected')
+                logger.info('Sierra Cell Modem USB kernel drivers loaded and USB device detected')
             else:
                 logger.error('Unable to load Sierra Cell Modem kernel drivers')
         else:
-            logger.info('Sierra Cell Modem USB kernel drivers already loaded and modem detected')
-
-        uuid = '02d5e625-86a7-448e-8880-91e0977ad4e5'
-        nm_id = 'ting'
-
-        if nm_id not in list_connection_ids():
-            logger.info(f'{nm_id} not found in NetworkManager connections. Attempting to add')
-            s_con = dbus.Dictionary({
-                'type': 'cdma',
-                'uuid': uuid,
-                'autoconnect': True,
-                'id': nm_id})
-
-            s_ipv4 = dbus.Dictionary({
-                'method': 'auto'})
-
-            s_serial = dbus.Dictionary({
-                'baud': 921600})
-
-            s_cdma = dbus.Dictionary({
-                'number': '#777'
-            })
-            s_ppp = dbus.Dictionary({
-                'baud': 460800
-            })
-
-            s_ipv6 = dbus.Dictionary({
-                'method': 'auto'})
-
-            con = dbus.Dictionary({
-                'connection': s_con,
-                'cdma': s_cdma,
-                'ipv4': s_ipv4,
-                'ppp': s_ppp,
-                #'serial': s_serial
-                })
-
-            bus = dbus.SystemBus()
-            proxy = bus.get_object("org.freedesktop.NetworkManager", 
-                "/org/freedesktop/NetworkManager/Settings")
-            settings = dbus.Interface(proxy, "org.freedesktop.NetworkManager.Settings")
-            settings.AddConnection(con)
-            if nm_id in list_connection_ids():
-                logger.info(f'Sucessfully added connection for {nm_id}')
-        else:
-            logger.info(f'{nm_id} already in list of NetworkManager connections')
+            logger.info('Sierra Cell Modem USB kernel drivers already loaded and USB device detected')
