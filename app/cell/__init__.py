@@ -27,7 +27,10 @@ def list_active_connections():
     """Returns a list of active connection names and IP addresses"""
     connections = []
     for conn in NetworkManager.NetworkManager.ActiveConnections:
-        connections.append(conn.Id + ' - ' + ','.join(address['address']
-                                                      for address
-                                                      in conn.Ip4Config.AddressData))
+        try:
+            connections.append(conn.Id + ' - ' + ','.join(address['address']
+                                                          for address
+                                                          in conn.Ip4Config.AddressData))
+        except AttributeError:
+            pass
     return connections
