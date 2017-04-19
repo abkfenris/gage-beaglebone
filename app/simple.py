@@ -194,7 +194,7 @@ if __name__ == '__main__':
         while True:
             sensor_cycle(ser)
 
-            for conn in cell.list_active_connections:
+            for conn in cell.list_active_connections():
                 logger.info('  ' + conn)
     
     else:
@@ -205,7 +205,7 @@ if __name__ == '__main__':
         for n in range(PRE_SHUTDOWN_TIME // WAIT):
             sensor_cycle(ser)
 
-            for conn in cell.list_active_connections:
+            for conn in cell.list_active_connections():
                 logger.info('  ' + conn)    
 
         
