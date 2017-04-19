@@ -216,6 +216,8 @@ if __name__ == '__main__':
                 logger.info(f'Update in progress: {pcape.update_percentage()}%. Giving it {MAX_UPDATE_WAIT} more seconds.')
                 MAX_UPDATE_WAIT -= WAIT
                 sensor_cycle(ser)
+                for conn in cell.list_active_connections():
+                    logger.info('  ' + conn)
                 if not pcape.update_in_progress():
                     break
         else:
