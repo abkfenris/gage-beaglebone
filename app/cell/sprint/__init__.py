@@ -19,7 +19,7 @@ class Sierra250U(CellConnection):
         uuid = '7fb0575b-64f9-4ff0-8820-637b9cbe54b3'
         nm_id = 'ting'
 
-        if nm_id in [conn.Id for conn in NetworkManager.NetworkManager.ActiveConnections()]:
+        if nm_id in [conn.Id for conn in NetworkManager.NetworkManager.ActiveConnections]:
             logger.info('ting connection currently active. Leaving it alone')
         else:
             for conn in NetworkManager.Settings.ListConnections():
