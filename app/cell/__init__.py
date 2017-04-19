@@ -25,8 +25,9 @@ def list_connection_ids():
 
 def list_active_connections():
     """Returns a list of active connection names and IP addresses"""
-    return [conn.Id + ' - ' + ','.join([address['address'] 
-                                        for address 
-                                        in conn.Ip4Config.AddressData]) 
-            for conn 
-            in NetworkManager.NetworkManager.ActiveConnections]
+    connections = []
+    for conn in NetworkManager.NetworkManager.ActiveConnections:
+        connections.append(conn.Id + ' - ' + ','.join(address['address']
+                                                      for address
+                                                      in conn.Ip4Config.AddressData))
+    return connections
