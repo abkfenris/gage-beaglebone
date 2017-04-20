@@ -174,6 +174,7 @@ if __name__ == '__main__':
     pcape.set_system_time()
 
     leds = pcape.StatusLEDs()
+    leds.led_1, leds.led_2 = False, False
 
     # setup cell
     sprint.Sierra250U()
