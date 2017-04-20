@@ -222,3 +222,36 @@ def update_percentage():
             logger.error('Unknown response from Resin supervisor')
     else:
         logger.error('RESIN_SUPERVISOR ADDRESS or RESIN_SUPERVISOR_API_KEY not set')
+
+
+class StatusLEDs(object):
+    """Lets you change the Powercape LEDs for showing board status"""
+    def __init__(self):
+        self.initial_register_value = powercapeI2C.readU8(3)
+        self._led_1 = False
+        self._led_2 = False
+    
+    def set_leds(self):
+        """Sets the LEDS to be illuminated or not and preserves the origional value"""
+        value = self.initial_register_value + self._led_1 * 2 + self._led_2 * 4
+        powercapeI2C.write8(3, value)
+
+    @property
+    def led_1(self):
+        return self._led_1
+
+    @led_1.setter
+    def led_1(self, value):
+        """ Set to True to toggle LED 1 on """
+        self._led_1 = value
+        self.set_leds()
+    
+    @property
+    def led_2(self):
+        return self._led_2
+    
+    @led_2.setter
+    def led_2(self, value):
+        """ Set to True to toggle LED 2 on """
+        self._led_2 = value
+        self.set_leds()

@@ -173,6 +173,8 @@ if __name__ == '__main__':
     
     pcape.set_system_time()
 
+    leds = pcape.StatusLEDs()
+
     # setup cell
     sprint.Sierra250U()
     
@@ -197,6 +199,10 @@ if __name__ == '__main__':
             for conn in cell.list_active_connections():
                 logger.info('  ' + conn)
     
+            if len(cell.list_active_connections()) > 0:
+                leds.led_2 = True
+            else:
+                leds.led_2 = False
     else:
         for n in range(SAMPLES_PER_RUN):
             sensor_cycle(ser)
