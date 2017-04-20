@@ -1,4 +1,5 @@
 import NetworkManager
+import dbus
 
 """
 Classes for cellular connections
@@ -32,5 +33,7 @@ def list_active_connections():
                                                           for address
                                                           in conn.Ip4Config.AddressData))
         except AttributeError:
+            pass
+        except dbus.exceptions.DBusException:
             pass
     return connections
