@@ -264,9 +264,9 @@ if __name__ == '__main__':
     cell_module_str, cell_method_str = CELL_TYPE.rsplit('.', 1)
 
     cell_module = importlib.import_module(cell_module_str)
-    Cell = getattr(cell_module, cell_method_str)
-    
-    cell = Cell()
+    Cell_Modem = getattr(cell_module, cell_method_str)
+
+    cell_modem = Cell_Modem()
     
     # setup serial
     ser = serial_setup()
