@@ -1,4 +1,4 @@
-import time, datetime, os, logging, subprocess, sys, statistics, csv
+import time, datetime, os, logging, subprocess, sys, statistics, csv, importlib
 import serial
 from logging.handlers import RotatingFileHandler
 
@@ -14,7 +14,7 @@ FILE_LOG_FOLDER = os.environ.get('GAGE_FILE_LOG_FOLDER', STORAGE_MOUNT_PATH + '/
 MAX_LOG_FILES = int(os.environ.get('MAX_LOG_FILES', 10))
 WAIT = int(os.environ.get('GAGE_SAMPLE_WAIT', 5))
 MIN_VOLTAGE = float(os.environ.get('GAGE_MIN_VOLTAGE', 3.0))
-CELL_TYPE = os.environ.get('GAGE_CELL_TYPE', 'ting-sierra-250u')
+CELL_TYPE = os.environ.get('GAGE_CELL_TYPE', 'cell.sprint.Sierra250U')
 SAMPLES_PER_RUN = int(os.environ.get('GAGE_SAMPLES_PER_RUN', 10))
 PRE_SHUTDOWN_TIME = int(os.environ.get('GAGE_PRE_SHUTDOWN_TIME', 30))
 MAX_UPDATE_WAIT = int(os.environ.get('GAGE_MAX_UPDATE_WAIT', 300))
@@ -261,7 +261,12 @@ if __name__ == '__main__':
         supervisor.shutdown()
 
     # setup cell
-    sprint.Sierra250U()
+    cell_module_str, cell_method_str = CELL_TYPE.rsplit('.', 1)
+
+    cell_module = importlib.import_module(cell_module_str)
+    Cell = getattr(cell_module, cell_method_str)
+    
+    cell = Cell()
     
     # setup serial
     ser = serial_setup()
