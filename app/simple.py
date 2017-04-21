@@ -11,7 +11,7 @@ UART = os.environ.get('GAGE_SERIAL_UART', 'UART2')
 STORAGE_MOUNT_PATH = os.environ.get('GAGE_STORAGE_MOUNT_PATH', '/mnt/gagedata')
 DATA_CSV_FOLDER = os.environ.get('GAGE_DATA_CSV_FOLDER', STORAGE_MOUNT_PATH + '/logs/')
 FILE_LOG_FOLDER = os.environ.get('GAGE_FILE_LOG_FOLDER', STORAGE_MOUNT_PATH + '/syslogs/')
-MAX_LOG_FILES = int(os.environ.get('MAX_LOG_FILES', 3))
+MAX_LOG_FILES = int(os.environ.get('MAX_LOG_FILES', 10))
 WAIT = int(os.environ.get('GAGE_SAMPLE_WAIT', 5))
 MIN_VOLTAGE = float(os.environ.get('GAGE_MIN_VOLTAGE', 3.0))
 CELL_TYPE = os.environ.get('GAGE_CELL_TYPE', 'ting-sierra-250u')
@@ -140,22 +140,22 @@ def sensor_cycle(ser):
     except SamplingError as e:
         date = datetime.datetime.now()
         logger.error(f'{date} - Sampling error - {e}')
+        distance = None
+    date = datetime.datetime.now()
+    volts = round(power.checkVolts(), 2)
+    amps = round(power.checkAmps(), 2)
+
+    if amps < 0:
+        flow = 'charging'
+    elif amps < 2:
+        flow = 'float'
     else:
-        date = datetime.datetime.now()
-        volts = round(power.checkVolts(), 2)
-        amps = round(power.checkAmps(), 2)
+        flow = 'discharging'
 
-        if amps < 0:
-            flow = 'charging'
-        elif amps < 2:
-            flow = 'float'
-        else:
-            flow = 'discharging'
+    logger.info(f'{distance}mm {volts}v {flow} {amps}ma')
+    writerow((date, distance, 'mm ultrasound', volts, flow, amps))
 
-        logger.info(f'{distance}mm {volts}v {flow} {amps}ma')
-        writerow((date, distance, 'mm ultrasound', volts, flow, amps))
-
-        time.sleep(WAIT)
+    time.sleep(WAIT)
 
 
 def mount_data_sd(path):
@@ -233,7 +233,7 @@ if __name__ == '__main__':
             logger.debug(f'Created syslog directory {FILE_LOG_FOLDER}')
         
         # set up file logging
-        fh = RotatingFileHandler(FILE_LOG_FOLDER + 'syslog', maxBytes=10000000, backupCount=10)
+        fh = RotatingFileHandler(FILE_LOG_FOLDER + 'syslog', maxBytes=10000000, backupCount=MAX_LOG_FILES)
         fh.setLevel(log_levels.get(FILE_LOG_LEVEL, logging.DEBUG))
         fh.setFormatter(formatter)
         logger.addHandler(fh)

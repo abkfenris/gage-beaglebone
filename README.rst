@@ -22,7 +22,16 @@ Sensor sampling
 
   - ``GAGE_SERIAL_PORT`` - Serial Port dev path of sensor to sample (default ``'/dev/ttyS2'``)
   - ``GAGE_SERIAL_UART`` - Serial Port UART name of sensor (default ``'UART2'``)
+  - ``GAGE_STORAGE_MOUNT_PATH`` - Path to where the µSD card will be mounted (defaults to ``'/mnt/gagedata'``, currently shouldn't be changed)
+  - ``GAGE_DATA_CSV_FOLDER``
+  - ``GAGE_FILE_LOG_FOLDER``
+  - ``GAGE_MAX_LOG_FILES``
   - ``GAGE_SAMPLE_WAIT`` - Time to wait between collecting each sample (in seconds, default ``5``)
+  - ``GAGE_MIN_VOLTAGE``
+  - ``GAGE_CELL_TYPE``
+  - ``GAGE_SAMPLES_PER_RUN``
+  - ``GAGE_PRE_SHUTDOWN_TIME``
+  - ``GAGE_MAX_UPDATE_WAIT``
   - ``GAGE_SENSOR_LOW`` - Lowest valid value from the sensor (default ``501`` for using `Maxbotix MB7386`_)
   - ``GAGE_SENSOR_HIGH`` - Highest valid value from the sensor (default ``9998`` for using `Maxbotix MB7386`_)
   - ``GAGE_MIN_SAMPLES``
@@ -37,6 +46,7 @@ Power control
 
   - ``GAGE_POWER_CONSERVE`` - Should the gage shut down and go into power conservation mode between sampling sets
   - ``GAGE_RESTART_TIME``
+  - ``GAGE_MIN_VOLTAGE_RESTART_TIME``
   - ``GAGE_WATCHDOG_RESET_TIMEOUT``
   - ``GAGE_WATCHDOG_POWER_TIMEOUT``
   - ``GAGE_WATCHDOG_STOP_POWER_TIMEOUT``
