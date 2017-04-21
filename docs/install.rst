@@ -16,7 +16,7 @@ Initial setup
 Continue to follow the initial setup steps from beagleboard.org until you have an
 ssh session.
 
-1. Setup a new user
+1. Setup a new user ``adduser newuser`` https://www.digitalocean.com/community/tutorials/how-to-add-delete-and-grant-sudo-privileges-to-users-on-a-debian-vps
 2. Add user to sudoers
 
 Magic - aka Fabric

@@ -1,5 +1,0 @@
-Adafruit_BBIO
-itsdangerous
-requests
-pyserial
-peewee

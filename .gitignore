@@ -2,3 +2,4 @@
 *.pyc
 fabhosts.py
 docs/_build
+.resin-sync.yml

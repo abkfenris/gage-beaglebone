@@ -1,0 +1,38 @@
+From df8cf20f96b5ddefcb6aa9503d6ecaf579c67c5c Mon Sep 17 00:00:00 2001
+From: Alex Kerney <abk@mac.com>
+Date: Mon, 10 Apr 2017 23:00:03 +0000
+Subject: [PATCH] Patch for PowerCape being on Bus 2
+
+---
+ utils/ina219.c    | 2 +-
+ utils/powercape.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/utils/ina219.c b/utils/ina219.c
+index c0f95bb..fce2884 100644
+--- a/utils/ina219.c
++++ b/utils/ina219.c
+@@ -33,7 +33,7 @@ typedef enum {
+ op_type operation = OP_DUMP;
+
+ int interval = 60;
+-int i2c_bus = 1;
++int i2c_bus = 2;
+ int i2c_address = INA_ADDRESS;
+ int handle;
+ int whole_numbers = 0;
+diff --git a/utils/powercape.c b/utils/powercape.c
+index 1fa6520..b17d5e4 100644
+--- a/utils/powercape.c
++++ b/utils/powercape.c
+@@ -29,7 +29,7 @@ typedef enum {
+
+ op_type operation = OP_NONE;
+
+-int i2c_bus = 1;
++int i2c_bus = 2;
+ int handle;
+
+
+--
+2.1.4
