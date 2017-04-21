@@ -49,8 +49,11 @@ log_levels = {'DEBUG': logging.DEBUG,
 logger = logging.getLogger('gage')
 logger.setLevel(logging.DEBUG)
 
+formatter = logging.Formatter('%(asctime)s | %(name)s | %(levelname)s | %(message)s')
+
 ch = logging.StreamHandler(sys.stdout)
 ch.setLevel(log_levels.get(STDOUT_LOG_LEVEL, logging.WARNING))
+ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 
@@ -233,6 +236,7 @@ if __name__ == '__main__':
         # set up file logging
         fh = RotatingFileHandler(FILE_LOG_FOLDER + 'syslog', maxBytes=10000000, backupCount=10)
         fh.setLevel(log_levels.get(FILE_LOG_LEVEL, logging.DEBUG))
+        fh.setFormatter(formatter)
         logger.addHandler(fh)
 
         # Is the stop file present on the SD card
@@ -287,7 +291,7 @@ if __name__ == '__main__':
             pcape.set_cape_time()
             pcape.set_time(RESTART_TIME)
 
-            logger.info('Powercape info:')
+            logger.debug('Powercape info:')
             for line in pcape.powercape_info():
                 logger.debug('   ' + line)
             
