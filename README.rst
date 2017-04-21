@@ -23,11 +23,11 @@ Sensor sampling
   - ``GAGE_SERIAL_PORT`` - Serial Port dev path of sensor to sample (default ``'/dev/ttyS2'``)
   - ``GAGE_SERIAL_UART`` - Serial Port UART name of sensor (default ``'UART2'``)
   - ``GAGE_STORAGE_MOUNT_PATH`` - Path to where the µSD card will be mounted (defaults to ``'/mnt/gagedata'``, currently shouldn't be changed)
-  - ``GAGE_DATA_CSV_FOLDER``
-  - ``GAGE_FILE_LOG_FOLDER``
-  - ``GAGE_MAX_LOG_FILES``
+  - ``GAGE_DATA_CSV_FOLDER`` - Folder where logger data should be stored (default ``'/mnt/gagedata/logs/'``.
+  - ``GAGE_FILE_LOG_FOLDER`` - Folder where system logs should be stored in a rotating file ``'/mnt/gagedata/syslogs/'``.
+  - ``GAGE_MAX_LOG_FILES`` - Maximum number of rotating log files that should be stored (default 10).
   - ``GAGE_SAMPLE_WAIT`` - Time to wait between collecting each sample (in seconds, default ``5``)
-  - ``GAGE_MIN_VOLTAGE``
+  - ``GAGE_MIN_VOLTAGE`` - If the battery is below the voltage, the gage will power off early and sleep for ``GAGE_MIN_VOLTAGE_RESTART_TIME`` (Default 3.0). 
   - ``GAGE_CELL_TYPE``
   - ``GAGE_SAMPLES_PER_RUN``
   - ``GAGE_PRE_SHUTDOWN_TIME``
