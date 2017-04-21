@@ -1,8 +1,0 @@
-Adafruit_BBIO
-itsdangerous
-requests
-pyserial
-peewee
-ipython
-#netifaces
-python-networkmanager

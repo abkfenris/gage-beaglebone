@@ -29,8 +29,8 @@ WORKDIR /gage/PowerCape/utils
 RUN make
 
 WORKDIR /gage
-COPY /app/gage-requirements.txt /gage
-RUN pip install --no-cache-dir -r /gage/gage-requirements.txt
+COPY /app/requirements.txt /gage
+RUN pip install --no-cache-dir -r /gage/requirements.txt
 
 RUN echo "LABEL=GAGEDATA /mnt/gagedata vfat defaults" >> /etc/fstab
 
