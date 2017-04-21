@@ -235,6 +235,7 @@ if __name__ == '__main__':
         fh.setLevel(log_levels.get(FILE_LOG_LEVEL, logging.DEBUG))
         logger.addHandler(fh)
 
+        # Is the stop file present on the SD card
         STOP = os.path.isfile(STORAGE_MOUNT_PATH + '/STOP')
 
         if not STOP:
@@ -245,16 +246,12 @@ if __name__ == '__main__':
         leds.led_1 = True # SD Card mounted and avaliable for storage
     else:
         logger.error('Micro SD card not avaliable for file storage')
+        STOP = False
 
     # setup serial
     ser = serial_setup()
 
-    if not POWER_CONSERVE or not STOP:
-        while True:
-            sensor_cycle(ser)
-
-            log_network_info()
-    else:
+    if POWER_CONSERVE or not STOP:
         for n in range(SAMPLES_PER_RUN):
             sensor_cycle(ser)
             
@@ -297,3 +294,9 @@ if __name__ == '__main__':
             leds.led_1, leds.led_2 = False, False
 
             supervisor.shutdown()
+    
+    else:
+        while True:
+            sensor_cycle(ser)
+
+            log_network_info()
