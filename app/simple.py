@@ -1,5 +1,6 @@
 import time, datetime, os, logging, subprocess, sys, statistics, csv
 import serial
+from logging.handlers import RotatingFileHandler
 
 import power, pcape, supervisor, cell
 from cell import sprint
@@ -183,7 +184,18 @@ def remove_old_log_files():
     for path in old:
         logger.info(f'Removing log {path} as there are more than MAX_LOG_FILES ({MAX_LOG_FILES}).')
         os.remove(path)
+
+def log_network_info():
+    """ Log current network status and toggle LEDs """
+    connections = cell.list_active_connections()
+    for conn in connections:
+        logger.debug(conn)
     
+    if len(connections) > 0:
+        leds.led_2 = True # network connection avaliable
+    else:
+        leds.led_2 = False
+
 
 if __name__ == '__main__':
     #if POWER_CONSERVE:
@@ -219,7 +231,7 @@ if __name__ == '__main__':
             logger.debug(f'Created syslog directory {FILE_LOG_FOLDER}')
         
         # set up file logging
-        fh = logging.handlers.RotatingFileHandler(FILE_LOG_FOLDER + 'syslog', maxBytes=10000000, backupCount=10)
+        fh = RotatingFileHandler(FILE_LOG_FOLDER + 'syslog', maxBytes=10000000, backupCount=10)
         fh.setLevel(log_levels.get(FILE_LOG_LEVEL, logging.DEBUG))
         logger.addHandler(fh)
 
@@ -241,39 +253,18 @@ if __name__ == '__main__':
         while True:
             sensor_cycle(ser)
 
-            connections = cell.list_active_connections()
-            for conn in connections:
-                logger.debug('  ' + conn)
-            
-            if len(connections) > 0:
-                leds.led_2 = True # network connection avaliable
-            else:
-                leds.led_2 = False
+            log_network_info()
     else:
         for n in range(SAMPLES_PER_RUN):
             sensor_cycle(ser)
             
-            connections = cell.list_active_connections()
-            for conn in connections:
-                logger.debug('  ' + conn)
-            
-            if len(connections) > 0:
-                leds.led_2 = True # network connection avaliable
-            else:
-                leds.led_2 = False
+            log_network_info()
         
         logger.info(f'Sensing for {PRE_SHUTDOWN_TIME} more seconds to allow communication.')
         for n in range(PRE_SHUTDOWN_TIME // WAIT):
             sensor_cycle(ser)
 
-            connections = cell.list_active_connections()
-            for conn in connections:
-                logger.debug('  ' + conn)
-            
-            if len(connections) > 0:
-                leds.led_2 = True # network connection avaliable
-            else:
-                leds.led_2 = False
+            log_network_info()
         
         #pcape.set_time(WATCHDOG_START_POWER_TIMEOUT)
 
@@ -283,14 +274,7 @@ if __name__ == '__main__':
                 MAX_UPDATE_WAIT -= WAIT
                 sensor_cycle(ser)
                 
-                connections = cell.list_active_connections()
-                for conn in connections:
-                    logger.debug('  ' + conn)
-                
-                if len(connections) > 0:
-                    leds.led_2 = True # network connection avaliable
-                else:
-                    leds.led_2 = False
+                log_network_info()
 
                 if not pcape.update_in_progress():
                     break
