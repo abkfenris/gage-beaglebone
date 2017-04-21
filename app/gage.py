@@ -26,37 +26,37 @@ import pcape
 import power
 from utils import Timeout, TimeoutError
 
-import config
+# import config
 
-logger = logging.getLogger('gage')
-logger.setLevel(config.LOG_LEVEL)
+# logger = logging.getLogger('gage')
+# logger.setLevel(config.LOG_LEVEL)
 
-handler = RotatingFileHandler(config.LOG_PATH,
-                              maxBytes=config.LOG_SIZE,
-                              backupCount=config.LOG_BACKUP)
+# handler = RotatingFileHandler(config.LOG_PATH,
+#                               maxBytes=config.LOG_SIZE,
+#                               backupCount=config.LOG_BACKUP)
 
-logger.addHandler(handler)
-streamhandler = logging.StreamHandler(sys.stdout)
-logger.addHandler(streamhandler)
+# logger.addHandler(handler)
+# streamhandler = logging.StreamHandler(sys.stdout)
+# logger.addHandler(streamhandler)
 
-try:
-    config.RAVEN
-except AttributeError:
-    logger.exception('Unable to access config.RAVEN. Not logging to Sentry')
-else:
-    from raven.handlers.logging import SentryHandler
-    from raven.conf import setup_logging
-    from raven import Client as RavenClient
-    sentry_client = RavenClient(config.RAVEN)
-    sentry_handler = SentryHandler(sentry_client)
-    logger.addHandler(sentry_handler)
-    setup_logging(sentry_handler)
+# try:
+#     config.RAVEN
+# except AttributeError:
+#     logger.exception('Unable to access config.RAVEN. Not logging to Sentry')
+# else:
+#     from raven.handlers.logging import SentryHandler
+#     from raven.conf import setup_logging
+#     from raven import Client as RavenClient
+#     sentry_client = RavenClient(config.RAVEN)
+#     sentry_handler = SentryHandler(sentry_client)
+#     logger.addHandler(sentry_handler)
+#     setup_logging(sentry_handler)
 
 
 
-db = SqliteDatabase('/boot/uboot/gage.db')
+# db = SqliteDatabase('/boot/uboot/gage.db')
 
-GPIO.setup('P8_12', GPIO.IN)
+# GPIO.setup('P8_12', GPIO.IN)
 
 
 class BaseModel(Model):
@@ -191,4 +191,4 @@ if __name__ == '__main__':
         pcape.set_wdt_stop(0)
         exit()
 else:
-    print 'gage.py is imported'
+    print('gage.py is imported')

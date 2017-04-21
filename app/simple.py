@@ -266,7 +266,7 @@ if __name__ == '__main__':
     # setup serial
     ser = serial_setup()
 
-    if POWER_CONSERVE or not STOP:
+    if POWER_CONSERVE and not STOP:
         for n in range(SAMPLES_PER_RUN):
             sensor_cycle(ser)
             
