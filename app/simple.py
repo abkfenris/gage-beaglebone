@@ -9,6 +9,7 @@ PORT = os.environ.get('GAGE_SERIAL_PORT', '/dev/ttyS2')
 UART = os.environ.get('GAGE_SERIAL_UART', 'UART2')
 STORAGE_MOUNT_PATH = os.environ.get('GAGE_STORAGE_MOUNT_PATH', '/mnt/gagedata')
 DATA_CSV_FOLDER = os.environ.get('GAGE_DATA_CSV_FOLDER', STORAGE_MOUNT_PATH + '/logs/')
+FILE_LOG_FOLDER = os.environ.get('GAGE_FILE_LOG_FOLDER', STORAGE_MOUNT_PATH + '/syslogs/')
 MAX_LOG_FILES = int(os.environ.get('MAX_LOG_FILES', 3))
 WAIT = int(os.environ.get('GAGE_SAMPLE_WAIT', 5))
 MIN_VOLTAGE = float(os.environ.get('GAGE_MIN_VOLTAGE', 3.2))
@@ -33,10 +34,22 @@ WATCHDOG_STOP_POWER_TIMEOUT = int(os.environ.get('GAGE_WATCHDOG_STOP_POWER_TIMEO
 WATCHDOG_START_POWER_TIMEOUT = int(os.environ.get('GAGE_WATCHDOG_START_POWER_TIMEOUT', 60))
 STARTUP_REASONS = os.environ.get('GAGE_STARTUP_REASONS', '0x09')
 
+# Logging levels
+STDOUT_LOG_LEVEL = os.environ.get('GAGE_STDOUT_LOG_LEVEL', 'WARNING').upper()
+FILE_LOG_LEVEL = os.environ.get('GAGE_FILE_LOG_LEVEL', 'INFO').upper()
+
+
+log_levels = {'DEBUG': logging.DEBUG,
+              'INFO': logging.INFO,
+              'WARNING': logging.WARNING,
+              'ERROR': logging.ERROR,
+              'CRITICAL': logging.CRITICAL}
 
 logger = logging.getLogger('gage')
 logger.setLevel(logging.DEBUG)
+
 ch = logging.StreamHandler(sys.stdout)
+ch.setLevel(log_levels.get(STDOUT_LOG_LEVEL, logging.WARNING))
 logger.addHandler(ch)
 
 
@@ -144,17 +157,17 @@ def mount_data_sd(path):
     try:
         os.mkdir(path)
     except OSError:
-        logger.info(f'{path} already exists. Storage should be mounted')
+        logger.debug(f'{path} already exists. Storage should be mounted')
     else:
-        logger.info(f'Created mount point for microSD at {path}')
+        logger.debug(f'Created mount point for microSD at {path}')
     
     output = subprocess.run([f'mount {path}'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     if f"mount can't find {path} in /etc/fstab" in output.stderr.decode('ASCII'):
         logger.error("/etc/fstab doesn't include mount {path}")
     elif f'is already mounted on {path}' in output.stderr.decode('ASCII'):
-        logger.info(f'MicroSD storage already mounted at {path}')
+        logger.debug(f'MicroSD storage already mounted at {path}')
     else:
-        logger.info(f'MicroSD storage mounted at {path}')
+        logger.debug(f'MicroSD storage mounted at {path}')
     
 
 def sd_avaliable():
@@ -188,19 +201,36 @@ if __name__ == '__main__':
     SD_CARD = sd_avaliable()
     
     if SD_CARD:
+        logger.debug('SD block storage avaliable, attempting to mount')
         mount_data_sd(STORAGE_MOUNT_PATH)
+
         try:
             os.mkdir(DATA_CSV_FOLDER)
         except OSError:
-            logger.info(f'Log directory {DATA_CSV_FOLDER} already exists')
+            logger.debug(f'Log directory {DATA_CSV_FOLDER} already exists')
         else:
-            logger.info(f'Created log directory {DATA_CSV_FOLDER}')
+            logger.debug(f'Created log directory {DATA_CSV_FOLDER}')
         
+        try:
+            os.mkdir(FILE_LOG_FOLDER)
+        except OSError:
+            logger.debug(f'Syslog directory {FILE_LOG_FOLDER} already exists')
+        else:
+            logger.debug(f'Created syslog directory {FILE_LOG_FOLDER}')
+        
+        # set up file logging
+        fh = logging.handlers.RotatingFileHandler(FILE_LOG_FOLDER + 'syslog', maxBytes=10000000, backupCount=10)
+        fh.setLevel(log_levels.get(FILE_LOG_LEVEL, logging.DEBUG))
+        logger.addHandler(fh)
+
         STOP = os.path.isfile(STORAGE_MOUNT_PATH + '/STOP')
 
         if not STOP:
             remove_old_log_files()
+        
         DATA_CSV_PATH = DATA_CSV_FOLDER + datetime.date.today().isoformat() + '.csv'
+        
+        leds.led_1 = True # SD Card mounted and avaliable for storage
     else:
         logger.error('Micro SD card not avaliable for file storage')
 
@@ -211,22 +241,24 @@ if __name__ == '__main__':
         while True:
             sensor_cycle(ser)
 
-            for conn in cell.list_active_connections():
+            connections = cell.list_active_connections()
+            for conn in connections:
                 logger.debug('  ' + conn)
             
-            if len(cell.list_active_connections()) > 0:
-                leds.led_2 = True
+            if len(connections) > 0:
+                leds.led_2 = True # network connection avaliable
             else:
                 leds.led_2 = False
     else:
         for n in range(SAMPLES_PER_RUN):
             sensor_cycle(ser)
             
-            for conn in cell.list_active_connections():
+            connections = cell.list_active_connections()
+            for conn in connections:
                 logger.debug('  ' + conn)
             
-            if len(cell.list_active_connections()) > 0:
-                leds.led_2 = True
+            if len(connections) > 0:
+                leds.led_2 = True # network connection avaliable
             else:
                 leds.led_2 = False
         
@@ -234,11 +266,12 @@ if __name__ == '__main__':
         for n in range(PRE_SHUTDOWN_TIME // WAIT):
             sensor_cycle(ser)
 
-            for conn in cell.list_active_connections():
-                logger.debug('  ' + conn)    
+            connections = cell.list_active_connections()
+            for conn in connections:
+                logger.debug('  ' + conn)
             
-            if len(cell.list_active_connections()) > 0:
-                leds.led_2 = True
+            if len(connections) > 0:
+                leds.led_2 = True # network connection avaliable
             else:
                 leds.led_2 = False
         
@@ -249,10 +282,13 @@ if __name__ == '__main__':
                 logger.info(f'Update in progress: {pcape.update_percentage()}%. Giving it {MAX_UPDATE_WAIT} more seconds.')
                 MAX_UPDATE_WAIT -= WAIT
                 sensor_cycle(ser)
-                for conn in cell.list_active_connections():
-                    logger.info('  ' + conn)
-                if len(cell.list_active_connections()) > 0:
-                    leds.led_2 = True
+                
+                connections = cell.list_active_connections()
+                for conn in connections:
+                    logger.debug('  ' + conn)
+                
+                if len(connections) > 0:
+                    leds.led_2 = True # network connection avaliable
                 else:
                     leds.led_2 = False
 
