@@ -36,4 +36,5 @@ def list_active_connections():
             pass
         except dbus.exceptions.DBusException:
             pass
+            
     return connections

@@ -157,6 +157,11 @@ def mount_data_sd(path):
         logger.info(f'MicroSD storage mounted at {path}')
     
 
+def sd_avaliable():
+    """ Returns True if the SD card block device is avaliable to the system """
+    output = subprocess.run('fdisk -l', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    return 'mmcblk0' in output.stdout.decode('ASCII')
+
 
 def remove_old_log_files():
     """Removes log files older than MAX_LOG_FILES"""
@@ -180,26 +185,35 @@ if __name__ == '__main__':
     sprint.Sierra250U()
     
     # mount SD and clean out old log files
-    mount_data_sd(STORAGE_MOUNT_PATH)
-    try:
-        os.mkdir(DATA_CSV_FOLDER)
-    except OSError:
-        logger.info(f'Log directory {DATA_CSV_FOLDER} already exists')
+    SD_CARD = sd_avaliable()
+    
+    if SD_CARD:
+        mount_data_sd(STORAGE_MOUNT_PATH)
+        try:
+            os.mkdir(DATA_CSV_FOLDER)
+        except OSError:
+            logger.info(f'Log directory {DATA_CSV_FOLDER} already exists')
+        else:
+            logger.info(f'Created log directory {DATA_CSV_FOLDER}')
+        
+        STOP = os.path.isfile(STORAGE_MOUNT_PATH + '/STOP')
+
+        if not STOP:
+            remove_old_log_files()
+        DATA_CSV_PATH = DATA_CSV_FOLDER + datetime.date.today().isoformat() + '.csv'
     else:
-        logger.info(f'Created log directory {DATA_CSV_FOLDER}')
-    remove_old_log_files()
-    DATA_CSV_PATH = DATA_CSV_FOLDER + datetime.date.today().isoformat() + '.csv'
+        logger.error('Micro SD card not avaliable for file storage')
 
     # setup serial
     ser = serial_setup()
 
-    if not POWER_CONSERVE:
+    if not POWER_CONSERVE or not STOP:
         while True:
             sensor_cycle(ser)
 
             for conn in cell.list_active_connections():
-                logger.info('  ' + conn)
-    
+                logger.debug('  ' + conn)
+            
             if len(cell.list_active_connections()) > 0:
                 leds.led_2 = True
             else:
@@ -207,14 +221,26 @@ if __name__ == '__main__':
     else:
         for n in range(SAMPLES_PER_RUN):
             sensor_cycle(ser)
+            
+            for conn in cell.list_active_connections():
+                logger.debug('  ' + conn)
+            
+            if len(cell.list_active_connections()) > 0:
+                leds.led_2 = True
+            else:
+                leds.led_2 = False
         
         logger.info(f'Sensing for {PRE_SHUTDOWN_TIME} more seconds to allow communication.')
         for n in range(PRE_SHUTDOWN_TIME // WAIT):
             sensor_cycle(ser)
 
             for conn in cell.list_active_connections():
-                logger.info('  ' + conn)    
-
+                logger.debug('  ' + conn)    
+            
+            if len(cell.list_active_connections()) > 0:
+                leds.led_2 = True
+            else:
+                leds.led_2 = False
         
         #pcape.set_time(WATCHDOG_START_POWER_TIMEOUT)
 
@@ -225,19 +251,29 @@ if __name__ == '__main__':
                 sensor_cycle(ser)
                 for conn in cell.list_active_connections():
                     logger.info('  ' + conn)
+                if len(cell.list_active_connections()) > 0:
+                    leds.led_2 = True
+                else:
+                    leds.led_2 = False
+
                 if not pcape.update_in_progress():
                     break
         else:
-            logger.info('No update scheduled, getting ready to shutdown')
+            logger.debug('No update scheduled, getting ready to shutdown')
 
         
-        # set startup reasons
-        pcape.set_startup_reasons(STARTUP_REASONS)
-        pcape.set_cape_time()
-        pcape.set_time(RESTART_TIME)
+        STOP = os.path.isfile(STORAGE_MOUNT_PATH + '/STOP')
 
-        logger.info('Powercape info:')
-        for line in pcape.powercape_info():
-            logger.info('   ' + line)
+        if not STOP:
+            # set startup reasons
+            pcape.set_startup_reasons(STARTUP_REASONS)
+            pcape.set_cape_time()
+            pcape.set_time(RESTART_TIME)
 
-        supervisor.shutdown()
+            logger.info('Powercape info:')
+            for line in pcape.powercape_info():
+                logger.debug('   ' + line)
+            
+            leds.led_1, leds.led_2 = False, False
+
+            supervisor.shutdown()

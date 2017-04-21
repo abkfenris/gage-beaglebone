@@ -12,7 +12,7 @@ def shutdown():
     """
     Uses dbus to shutdown, and sets a 60 second timeout on powercape to make sure
     """
-    logger.info('Shutting down using dbus')
+    logger.debug('Shutting down using dbus')
     pcape.set_wdt_stop(60)
 
     bus = dbus.SystemBus()
@@ -24,7 +24,7 @@ def reboot():
     """
     Uses dbus to restart
     """
-    logger.info('Using dbus to restart')
+    logger.debug('Using dbus to restart')
 
     bus = dbus.SystemBus()
     bus_object = bus.get_object('org.freedesktop.systemd1', '/org/freedesktop/systemd1')
