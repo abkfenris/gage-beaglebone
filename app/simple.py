@@ -18,6 +18,7 @@ CELL_TYPE = os.environ.get('GAGE_CELL_TYPE', 'cell.sprint.Sierra250U')
 SAMPLES_PER_RUN = int(os.environ.get('GAGE_SAMPLES_PER_RUN', 10))
 PRE_SHUTDOWN_TIME = int(os.environ.get('GAGE_PRE_SHUTDOWN_TIME', 30))
 MAX_UPDATE_WAIT = int(os.environ.get('GAGE_MAX_UPDATE_WAIT', 300))
+INVERT_SAMPLE = bool(os.environ.get('GAGE_INVERT_SAMPLE', False))
 
 SENSOR_LOW = int(os.environ.get('GAGE_SENSOR_LOW', 501))
 SENSOR_HIGH = int(os.environ.get('GAGE_SENSOR_HIGH', 9998))
@@ -142,6 +143,8 @@ def sensor_cycle(ser):
     """Collect and log sensor data once"""
     try:
         distance = clean_sample_mean(read_serial, ser, SENSOR_LOW, SENSOR_HIGH, MIN_SAMPLES, MAX_ATTEMPTS, MAX_STD_DEV)
+        if INVERT_SAMPLE:
+            distance = SENSOR_HIGH - distance
     except SamplingError as e:
         date = datetime.datetime.now()
         logger.error(f'{date} - Sampling error - {e}')
