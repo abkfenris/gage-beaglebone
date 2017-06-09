@@ -42,6 +42,11 @@ STDOUT_LOG_LEVEL = os.environ.get('GAGE_STDOUT_LOG_LEVEL', 'WARNING').upper()
 FILE_LOG_LEVEL = os.environ.get('GAGE_FILE_LOG_LEVEL', 'INFO').upper()
 
 
+# Testing Environment Variables
+TESTING_NO_CELL = os.environ.get('TESTING_NO_CELL')
+
+
+
 log_levels = {'DEBUG': logging.DEBUG,
               'INFO': logging.INFO,
               'WARNING': logging.WARNING,
@@ -260,13 +265,14 @@ if __name__ == '__main__':
 
         supervisor.shutdown()
 
-    # setup cell
-    cell_module_str, cell_method_str = CELL_TYPE.rsplit('.', 1)
+    if not TESTING_NO_CELL:
+        # setup cell
+        cell_module_str, cell_method_str = CELL_TYPE.rsplit('.', 1)
 
-    cell_module = importlib.import_module(cell_module_str)
-    Cell_Modem = getattr(cell_module, cell_method_str)
+        cell_module = importlib.import_module(cell_module_str)
+        Cell_Modem = getattr(cell_module, cell_method_str)
 
-    cell_modem = Cell_Modem()
+        cell_modem = Cell_Modem()
     
     # setup serial
     ser = serial_setup()
