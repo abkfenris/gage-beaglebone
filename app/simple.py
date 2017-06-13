@@ -4,7 +4,7 @@ from logging.handlers import RotatingFileHandler
 
 import power, pcape, supervisor, cell
 from cell import sprint
-from gage_client import Client
+from gage_client.gage_client import Client
 
 # Sensor Sampling Environment Variables
 PORT = os.environ.get('GAGE_SERIAL_PORT', '/dev/ttyS2')
