@@ -147,7 +147,7 @@ def clean_sample_mean(sample_func, ser, low, high, min_samples, max_attempts, ma
     stdev = round(statistics.stdev(cleaned), 2)
     raise SamplingError(f'Stdev ({stdev}) did not meet criteria ({max_std_dev}) in {max_attempts}')
 
-def sensor_cycle(ser):
+def sensor_cycle(ser, client):
     """Collect and log sensor data once"""
     try:
         distance = clean_sample_mean(read_serial, ser, SENSOR_LOW, SENSOR_HIGH, MIN_SAMPLES, MAX_ATTEMPTS, MAX_STD_DEV)
@@ -160,6 +160,11 @@ def sensor_cycle(ser):
     date = datetime.datetime.now()
     volts = round(power.checkVolts(), 2)
     amps = round(power.checkAmps(), 2)
+
+    if distance:
+        client.reading('level', date, distance)
+        client.reading('volts', date, volts)
+        client.reading('amps', date, amps)
 
     if amps < 0:
         flow = 'charging'
@@ -289,15 +294,18 @@ if __name__ == '__main__':
     # setup serial
     ser = serial_setup()
 
+    # setup client for submission
+    client = Client(SUBMIT_URL, SUBMIT_ID, SUBMIT_KEY)
+
     if POWER_CONSERVE and not STOP:
         for n in range(SAMPLES_PER_RUN):
-            sensor_cycle(ser)
+            sensor_cycle(ser, client)
             
             log_network_info()
         
         logger.info(f'Sensing for {PRE_SHUTDOWN_TIME} more seconds to allow communication.')
         for n in range(PRE_SHUTDOWN_TIME // WAIT):
-            sensor_cycle(ser)
+            sensor_cycle(ser, client)
 
             log_network_info()
         
@@ -307,7 +315,7 @@ if __name__ == '__main__':
             for x in range(MAX_UPDATE_WAIT // WAIT):
                 logger.info(f'Update in progress: {pcape.update_percentage()}%. Giving it {MAX_UPDATE_WAIT} more seconds.')
                 MAX_UPDATE_WAIT -= WAIT
-                sensor_cycle(ser)
+                sensor_cycle(ser, client)
                 
                 log_network_info()
 
@@ -335,6 +343,6 @@ if __name__ == '__main__':
     
     else:
         while True:
-            sensor_cycle(ser)
+            sensor_cycle(ser, client)
 
             log_network_info()
