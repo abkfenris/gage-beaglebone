@@ -4,6 +4,7 @@ from logging.handlers import RotatingFileHandler
 
 import power, pcape, supervisor, cell
 from cell import sprint
+from gage_client import Client
 
 # Sensor Sampling Environment Variables
 PORT = os.environ.get('GAGE_SERIAL_PORT', '/dev/ttyS2')
@@ -26,6 +27,9 @@ MIN_SAMPLES = int(os.environ.get('GAGE_MIN_SAMPLES', 10))
 MAX_ATTEMPTS = int(os.environ.get('GAGE_MAX_ATTEMPTS', 100))
 MAX_STD_DEV = int(os.environ.get('GAGE_MAX_STD_DEV', 100))
 
+SUBMIT_ID = int(os.environ.get('GAGE_SUBMIT_ID'))
+SUBMIT_KEY = os.environ.get('GAGE_SUBMIT_KEY')
+SUBMIT_URL = os.environ.get('GAGE_SUBMIT_URL')
 
 # Power control Environment Variables
 POWER_CONSERVE = bool(os.environ.get('GAGE_POWER_CONSERVE', False))
@@ -77,9 +81,13 @@ class TooFewSamples(SamplingError):
 
 def writerow(row):
     """Write a row to the current csv file"""
-    with open(DATA_CSV_PATH, 'a') as f:
-        writer = csv.writer(f)
-        writer.writerow(row)
+    if DATA_CSV_PATH:
+        with open(DATA_CSV_PATH, 'a') as f:
+            writer = csv.writer(f)
+            writer.writerow(row)
+    else:
+        logger.warning(f'DATA_CSV_PATH not avaliable, would have written: {row}')
+
 
 
 def serial_setup():
@@ -257,6 +265,7 @@ if __name__ == '__main__':
         leds.led_1 = True # SD Card mounted and avaliable for storage
     else:
         logger.error('Micro SD card not avaliable for file storage')
+        DATA_CSV_PATH = False
         STOP = False
     
     if power.checkVolts() < MIN_VOLTAGE:
