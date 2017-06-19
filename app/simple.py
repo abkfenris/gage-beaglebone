@@ -37,7 +37,7 @@ RESTART_TIME = int(os.environ.get('GAGE_RESTART_TIME', 10))
 MIN_VOLTAGE_RESTART_TIME = int(os.environ.get('GAGE_MIN_VOLTAGE_RESTART_TIME', 25))
 WATCHDOG_RESET_TIMEOUT = int(os.environ.get('GAGE_WATCHDOG_RESET_TIMEOUT', 300))
 WATCHDOG_POWER_TIMEOUT = int(os.environ.get('GAGE_WATCHDOG_POWER_TIMEOUT', 300))
-WATCHDOG_STOP_POWER_TIMEOUT = int(os.environ.get('GAGE_WATCHDOG_STOP_POWER_TIMEOUT', 300))
+WATCHDOG_STOP_POWER_TIMEOUT = int(os.environ.get('GAGE_WATCHDOG_STOP_POWER_TIMEOUT', 600))
 WATCHDOG_START_POWER_TIMEOUT = int(os.environ.get('GAGE_WATCHDOG_START_POWER_TIMEOUT', 60))
 STARTUP_REASONS = os.environ.get('GAGE_STARTUP_REASONS', '0x09')
 
@@ -228,6 +228,8 @@ if __name__ == '__main__':
     #    pcape.set_wdt_power(WATCHDOG_POWER_TIMEOUT)
     
     pcape.set_system_time()
+    pcape.set_wdt_start(120)
+    pcape.set_wdt_power(WATCHDOG_STOP_POWER_TIMEOUT)
 
     leds = pcape.StatusLEDs()
     leds.led_1, leds.led_2 = False, False
@@ -298,12 +300,16 @@ if __name__ == '__main__':
     client = Client(SUBMIT_URL, SUBMIT_ID, SUBMIT_KEY)
 
     if POWER_CONSERVE and not STOP:
+        pcape.set_wdt_power(WATCHDOG_STOP_POWER_TIMEOUT)
+        
         for n in range(SAMPLES_PER_RUN):
             sensor_cycle(ser, client)
             
             log_network_info()
         
         logger.info(f'Sensing for {PRE_SHUTDOWN_TIME} more seconds to allow communication.')
+        pcape.set_wdt_power(WATCHDOG_STOP_POWER_TIMEOUT)
+
         for n in range(PRE_SHUTDOWN_TIME // WAIT):
             sensor_cycle(ser, client)
 
@@ -313,6 +319,7 @@ if __name__ == '__main__':
 
         if pcape.update_in_progress():
             for x in range(MAX_UPDATE_WAIT // WAIT):
+                pcape.set_wdt_power(WATCHDOG_STOP_POWER_TIMEOUT)
                 logger.info(f'Update in progress: {pcape.update_percentage()}%. Giving it {MAX_UPDATE_WAIT} more seconds.')
                 MAX_UPDATE_WAIT -= WAIT
                 sensor_cycle(ser, client)
