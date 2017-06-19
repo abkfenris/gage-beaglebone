@@ -324,7 +324,8 @@ if __name__ == '__main__':
         else:
             logger.debug('No update scheduled, getting ready to shutdown')
 
-        
+        client.send_all()
+
         STOP = os.path.isfile(STORAGE_MOUNT_PATH + '/STOP')
 
         if not STOP:
