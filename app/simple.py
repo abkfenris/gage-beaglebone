@@ -162,9 +162,9 @@ def sensor_cycle(ser, client):
     amps = round(power.checkAmps(), 2)
 
     if distance:
-        client.reading('level', date, distance)
-        client.reading('volts', date, volts)
-        client.reading('amps', date, amps)
+        client.reading('level', str(date), distance)
+        client.reading('volts', str(date), volts)
+        client.reading('amps', str(date), amps)
 
     if amps < 0:
         flow = 'charging'
