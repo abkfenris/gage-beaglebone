@@ -38,7 +38,7 @@ MIN_VOLTAGE_RESTART_TIME = int(os.environ.get('GAGE_MIN_VOLTAGE_RESTART_TIME', 2
 WATCHDOG_RESET_TIMEOUT = int(os.environ.get('GAGE_WATCHDOG_RESET_TIMEOUT', 300))
 WATCHDOG_POWER_TIMEOUT = int(os.environ.get('GAGE_WATCHDOG_POWER_TIMEOUT', 300))
 WATCHDOG_STOP_POWER_TIMEOUT = int(os.environ.get('GAGE_WATCHDOG_STOP_POWER_TIMEOUT', 600))
-WATCHDOG_START_POWER_TIMEOUT = int(os.environ.get('GAGE_WATCHDOG_START_POWER_TIMEOUT', 60))
+WATCHDOG_START_POWER_TIMEOUT = int(os.environ.get('GAGE_WATCHDOG_START_POWER_TIMEOUT', 120))
 STARTUP_REASONS = os.environ.get('GAGE_STARTUP_REASONS', '0x09')
 
 
@@ -228,8 +228,9 @@ if __name__ == '__main__':
     #    pcape.set_wdt_power(WATCHDOG_POWER_TIMEOUT)
     
     pcape.set_system_time()
-    pcape.set_wdt_start(120)
     pcape.set_wdt_power(WATCHDOG_STOP_POWER_TIMEOUT)
+    pcape.set_wdt_start(WATCHDOG_START_POWER_TIMEOUT)
+    
 
     leds = pcape.StatusLEDs()
     leds.led_1, leds.led_2 = False, False
