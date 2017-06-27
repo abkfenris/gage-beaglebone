@@ -1,7 +1,7 @@
 """
 Utility classes
 """
-import logging, signal, subprocess
+import logging, os, signal, subprocess
 
 import cell
 

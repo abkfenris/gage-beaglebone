@@ -6,7 +6,7 @@ from log import formatter, logger, log_levels
 import cell, config, power, pcape, supervisor, ultrasound
 from cell import sprint
 from gage_client.gage_client import Client
-from utils import log_network_info, sd_avaliable, uptime
+from utils import log_network_info, mount_data_sd, sd_avaliable, uptime
     
 
 class SensorError(Exception):
@@ -28,18 +28,6 @@ def writerow(row):
     else:
         logger.warning(f'DATA_CSV_PATH not avaliable, would have written: {row}')
 
-
-def read_serial(ser):
-    """Make 50 attempts to read the sensor serial data. Returns the first valid response"""
-    for _ in range(50):
-        ser.flushInput()
-        data = ser.read(5).decode('ASCII')
-        if len(data) == 5:
-            if data[0] == 'R' and data[1:5].isdigit(): # and data[1:5] != '9999'
-                return int(data[1:5])
-        logger.debug('Serial returned invalid info, trying again')
-    logger.error('Serial did not return valid info in 50 tries')
-    raise SensorError
 
 def clean_sample_mean(sample_func, ser, low, high, min_samples, max_attempts, max_std_dev):
     """With a given sampling_func, sample and discard outliers"""
@@ -74,7 +62,7 @@ def clean_sample_mean(sample_func, ser, low, high, min_samples, max_attempts, ma
 def sensor_cycle(ser, client):
     """Collect and log sensor data once"""
     try:
-        distance = clean_sample_mean(read_serial, ser, config.SENSOR_LOW, config.SENSOR_HIGH, config.MIN_SAMPLES, config.MAX_ATTEMPTS, config.MAX_STD_DEV)
+        distance = clean_sample_mean(ultrasound.read_serial, ser, config.SENSOR_LOW, config.SENSOR_HIGH, config.MIN_SAMPLES, config.MAX_ATTEMPTS, config.MAX_STD_DEV)
         if config.INVERT_SAMPLE:
             distance = config.SENSOR_HIGH - distance
     except SamplingError as e:
@@ -101,24 +89,6 @@ def sensor_cycle(ser, client):
     writerow((date, distance, 'mm ultrasound', volts, flow, amps))
 
     time.sleep(config.WAIT)
-
-
-def mount_data_sd(path):
-    """Mounts the microsd card for data storage at given path"""
-    try:
-        os.mkdir(path)
-    except OSError:
-        logger.debug(f'{path} already exists. Storage should be mounted')
-    else:
-        logger.debug(f'Created mount point for microSD at {path}')
-    
-    output = subprocess.run([f'mount {path}'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-    if f"mount can't find {path} in /etc/fstab" in output.stderr.decode('ASCII'):
-        logger.error("/etc/fstab doesn't include mount {path}")
-    elif f'is already mounted on {path}' in output.stderr.decode('ASCII'):
-        logger.debug(f'MicroSD storage already mounted at {path}')
-    else:
-        logger.debug(f'MicroSD storage mounted at {path}')
 
 
 def remove_old_log_files():
