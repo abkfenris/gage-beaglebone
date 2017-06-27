@@ -292,7 +292,7 @@ if __name__ == '__main__':
 
         pcape.set_startup_reasons(STARTUP_REASONS)
         pcape.set_cape_time()
-        pcape.set_time(MIN_VOLTAGE_RESTART_TIME)
+        pcape.set_time(RESTART_TIME)
 
         supervisor.shutdown()
 
