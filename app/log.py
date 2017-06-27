@@ -2,7 +2,7 @@
 Shared logger
 """
 
-import logging
+import logging, sys
 
 import config
 

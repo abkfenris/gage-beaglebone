@@ -1,4 +1,4 @@
-import time, datetime, os, logging, subprocess, sys, statistics, csv, importlib
+import time, datetime, os, subprocess, statistics, csv, importlib
 import serial
 from logging.handlers import RotatingFileHandler
 
