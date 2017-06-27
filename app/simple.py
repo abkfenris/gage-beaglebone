@@ -25,10 +25,10 @@ class TooFewSamples(SamplingError):
     pass
 
 
-def writerow(row):
+def writerow(row, data_csv_path):
     """Write a row to the current csv file"""
-    if DATA_CSV_PATH:
-        with open(DATA_CSV_PATH, 'a') as f:
+    if data_csv_path:
+        with open(data_csv_path, 'a') as f:
             writer = csv.writer(f)
             writer.writerow(row)
     else:
@@ -65,7 +65,7 @@ def clean_sample_mean(sample_func, ser, low, high, min_samples, max_attempts, ma
     stdev = round(statistics.stdev(cleaned), 2)
     raise SamplingError(f'Stdev ({stdev}) did not meet criteria ({max_std_dev}) in {max_attempts}')
 
-def sensor_cycle(ser, client):
+def sensor_cycle(ser, client, data_csv_path):
     """Collect and log sensor data once"""
     try:
         distance = clean_sample_mean(ultrasound.read_serial, ser, config.SENSOR_LOW, config.SENSOR_HIGH, config.MIN_SAMPLES, config.MAX_ATTEMPTS, config.MAX_STD_DEV)
@@ -92,7 +92,7 @@ def sensor_cycle(ser, client):
         flow = 'discharging'
 
     logger.info(f'{distance}mm {volts}v {flow} {amps}ma')
-    writerow((date, distance, 'mm ultrasound', volts, flow, amps))
+    writerow((date, distance, 'mm ultrasound', volts, flow, amps), data_csv_path)
 
     time.sleep(config.WAIT)
 
@@ -142,7 +142,7 @@ if __name__ == '__main__':
         if not STOP:
             remove_old_log_files()
         
-        DATA_CSV_PATH = config.DATA_CSV_FOLDER + datetime.date.today().isoformat() + '.csv'
+        data_csv_path = config.DATA_CSV_FOLDER + datetime.date.today().isoformat() + '.csv'
         
         leds.led_1 = True # SD Card mounted and avaliable for storage
     else:
@@ -189,7 +189,7 @@ if __name__ == '__main__':
         pcape.set_wdt_power(config.WATCHDOG_STOP_POWER_TIMEOUT)
         
         for n in range(config.SAMPLES_PER_RUN):
-            sensor_cycle(ser, client)
+            sensor_cycle(ser, client, data_csv_path)
             
             log_network_info(leds)
         
@@ -197,7 +197,7 @@ if __name__ == '__main__':
         pcape.set_wdt_power(config.WATCHDOG_STOP_POWER_TIMEOUT)
 
         for n in range(config.PRE_SHUTDOWN_TIME // config.WAIT):
-            sensor_cycle(ser, client)
+            sensor_cycle(ser, client, data_csv_path)
 
             log_network_info(leds)
         
@@ -209,7 +209,7 @@ if __name__ == '__main__':
                 pcape.set_wdt_power(config.WATCHDOG_STOP_POWER_TIMEOUT)
                 logger.info(f'Update in progress: {pcape.update_percentage()}%. Giving it {remaining_update_wait} more seconds.')
                 remaining_update_wait -= config.WAIT
-                sensor_cycle(ser, client)
+                sensor_cycle(ser, client, data_csv_path)
                 
                 log_network_info(leds)
 
@@ -238,6 +238,6 @@ if __name__ == '__main__':
     
     else:
         while True:
-            sensor_cycle(ser, client)
+            sensor_cycle(ser, client, data_csv_path)
 
             log_network_info()
