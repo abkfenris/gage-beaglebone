@@ -1,7 +1,6 @@
 """
 Shared logger
 """
-
 import logging, sys
 
 import config
