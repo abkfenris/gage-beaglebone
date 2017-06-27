@@ -5,7 +5,7 @@ from logging.handlers import RotatingFileHandler
 import cell, config, power, pcape, supervisor, ultrasound
 from cell import sprint
 from gage_client.gage_client import Client
-from utils import uptime
+from utils import uptime, log_network_info
 
 
 log_levels = {'DEBUG': logging.DEBUG,
@@ -170,17 +170,6 @@ def remove_old_log_files():
         logger.info(f'Removing log {path} as there are more than MAX_LOG_FILES ({config.MAX_LOG_FILES}).')
         os.remove(path)
 
-def log_network_info():
-    """ Log current network status and toggle LEDs """
-    connections = cell.list_active_connections()
-    for conn in connections:
-        logger.debug(conn)
-    
-    if len(connections) > 0:
-        leds.led_2 = True # network connection avaliable
-    else:
-        leds.led_2 = False
-
 
 if __name__ == '__main__':
     #if POWER_CONSERVE:
@@ -276,7 +265,7 @@ if __name__ == '__main__':
         for n in range(config.SAMPLES_PER_RUN):
             sensor_cycle(ser, client)
             
-            log_network_info()
+            log_network_info(leds)
         
         logger.info(f'Sensing for {config.PRE_SHUTDOWN_TIME} more seconds to allow communication.')
         pcape.set_wdt_power(config.WATCHDOG_STOP_POWER_TIMEOUT)
@@ -284,7 +273,7 @@ if __name__ == '__main__':
         for n in range(config.PRE_SHUTDOWN_TIME // config.WAIT):
             sensor_cycle(ser, client)
 
-            log_network_info()
+            log_network_info(leds)
         
         #pcape.set_time(WATCHDOG_START_POWER_TIMEOUT)
 
@@ -296,7 +285,7 @@ if __name__ == '__main__':
                 remaining_update_wait -= config.WAIT
                 sensor_cycle(ser, client)
                 
-                log_network_info()
+                log_network_info(leds)
 
                 if not pcape.update_in_progress():
                     break
