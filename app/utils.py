@@ -1,9 +1,12 @@
 """
 Utility classes
 """
-import signal
+import logging, signal
 
 import cell
+
+logger = logging.getLogger('gage')
+
 
 class TimeoutError(Exception):
     pass
