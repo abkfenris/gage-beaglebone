@@ -81,6 +81,7 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 if SENTRY_DSN:
+    logger.info('setting up Sentry logging')
     from raven import Client as Raven_Client
     from raven.handlers.logging import SentryHandler
 
@@ -97,6 +98,7 @@ if SENTRY_DSN:
     raven_handler.setLevel(log_levels.get(SENTRY_LOG_LEVEL, logging.WARNING))
 
     logger.addHandler(raven_handler)
+    
 
 class SensorError(Exception):
     pass
