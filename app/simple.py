@@ -157,9 +157,9 @@ def clean_sample_mean(sample_func, ser, low, high, min_samples, max_attempts, ma
 def sensor_cycle(ser, client):
     """Collect and log sensor data once"""
     try:
-        distance = clean_sample_mean(read_serial, ser, SENSOR_LOW, SENSOR_HIGH, MIN_SAMPLES, MAX_ATTEMPTS, MAX_STD_DEV)
-        if INVERT_SAMPLE:
-            distance = SENSOR_HIGH - distance
+        distance = clean_sample_mean(read_serial, ser, config.SENSOR_LOW, config.SENSOR_HIGH, config.MIN_SAMPLES, config.MAX_ATTEMPTS, config.MAX_STD_DEV)
+        if config.INVERT_SAMPLE:
+            distance = config.SENSOR_HIGH - distance
     except SamplingError as e:
         date = datetime.datetime.now()
         logger.error(f'{date} - Sampling error - {e}')
@@ -212,10 +212,10 @@ def sd_avaliable():
 
 def remove_old_log_files():
     """Removes log files older than MAX_LOG_FILES"""
-    ordered = sorted((DATA_CSV_FOLDER + filename for filename in os.listdir(DATA_CSV_FOLDER)), key=os.path.getctime, reverse=True)
-    old = ordered[MAX_LOG_FILES:]
+    ordered = sorted((config.DATA_CSV_FOLDER + filename for filename in os.listdir(config.DATA_CSV_FOLDER)), key=os.path.getctime, reverse=True)
+    old = ordered[config.MAX_LOG_FILES:]
     for path in old:
-        logger.info(f'Removing log {path} as there are more than MAX_LOG_FILES ({MAX_LOG_FILES}).')
+        logger.info(f'Removing log {path} as there are more than MAX_LOG_FILES ({config.MAX_LOG_FILES}).')
         os.remove(path)
 
 def log_network_info():
@@ -235,8 +235,8 @@ if __name__ == '__main__':
     #    pcape.set_wdt_power(WATCHDOG_POWER_TIMEOUT)
     
     pcape.set_system_time()
-    pcape.set_wdt_power(WATCHDOG_STOP_POWER_TIMEOUT)
-    pcape.set_wdt_start(WATCHDOG_START_POWER_TIMEOUT)
+    pcape.set_wdt_power(config.WATCHDOG_STOP_POWER_TIMEOUT)
+    pcape.set_wdt_start(config.WATCHDOG_START_POWER_TIMEOUT)
     
 
     leds = pcape.StatusLEDs()
@@ -247,35 +247,35 @@ if __name__ == '__main__':
     
     if SD_CARD:
         logger.debug('SD block storage avaliable, attempting to mount')
-        mount_data_sd(STORAGE_MOUNT_PATH)
+        mount_data_sd(config.STORAGE_MOUNT_PATH)
 
         try:
-            os.mkdir(DATA_CSV_FOLDER)
+            os.mkdir(config.DATA_CSV_FOLDER)
         except OSError:
-            logger.debug(f'Log directory {DATA_CSV_FOLDER} already exists')
+            logger.debug(f'Log directory {config.DATA_CSV_FOLDER} already exists')
         else:
-            logger.debug(f'Created log directory {DATA_CSV_FOLDER}')
+            logger.debug(f'Created log directory {config.DATA_CSV_FOLDER}')
         
         try:
-            os.mkdir(FILE_LOG_FOLDER)
+            os.mkdir(config.FILE_LOG_FOLDER)
         except OSError:
-            logger.debug(f'Syslog directory {FILE_LOG_FOLDER} already exists')
+            logger.debug(f'Syslog directory {config.FILE_LOG_FOLDER} already exists')
         else:
-            logger.debug(f'Created syslog directory {FILE_LOG_FOLDER}')
+            logger.debug(f'Created syslog directory {config.FILE_LOG_FOLDER}')
         
         # set up file logging
-        fh = RotatingFileHandler(FILE_LOG_FOLDER + 'syslog', maxBytes=10000000, backupCount=MAX_LOG_FILES)
-        fh.setLevel(log_levels.get(FILE_LOG_LEVEL, logging.DEBUG))
+        fh = RotatingFileHandler(config.FILE_LOG_FOLDER + 'syslog', maxBytes=10000000, backupCount=MAX_LOG_FILES)
+        fh.setLevel(log_levels.get(config.FILE_LOG_LEVEL, logging.DEBUG))
         fh.setFormatter(formatter)
         logger.addHandler(fh)
 
         # Is the stop file present on the SD card
-        STOP = os.path.isfile(STORAGE_MOUNT_PATH + '/STOP')
+        STOP = os.path.isfile(config.STORAGE_MOUNT_PATH + '/STOP')
 
         if not STOP:
             remove_old_log_files()
         
-        DATA_CSV_PATH = DATA_CSV_FOLDER + datetime.date.today().isoformat() + '.csv'
+        DATA_CSV_PATH = config.DATA_CSV_FOLDER + datetime.date.today().isoformat() + '.csv'
         
         leds.led_1 = True # SD Card mounted and avaliable for storage
     else:
@@ -283,27 +283,27 @@ if __name__ == '__main__':
         DATA_CSV_PATH = False
         STOP = False
     
-    if power.checkVolts() < MIN_VOLTAGE:
+    if power.checkVolts() < config.MIN_VOLTAGE:
         logger.error(f'System voltage has fallen below minimum voltage specified ({MIN_VOLTAGE} V). Shutting down for {MIN_VOLTAGE_RESTART_TIME} min to charge.')
         
-        pcape.set_startup_reasons(STARTUP_REASONS)
+        pcape.set_startup_reasons(config.STARTUP_REASONS)
         pcape.set_cape_time()
-        pcape.set_time(MIN_VOLTAGE_RESTART_TIME)
+        pcape.set_time(config.MIN_VOLTAGE_RESTART_TIME)
 
         supervisor.shutdown()
 
-    if uptime() > MAX_UPTIME and POWER_CONSERVE:
+    if uptime() > config.MAX_UPTIME and config.POWER_CONSERVE:
         logger.error(f'System has been up for longer than the maximum allowed uptime ({uptime()} > {MAX_UPTIME} seconds). Shutting down.')
 
-        pcape.set_startup_reasons(STARTUP_REASONS)
+        pcape.set_startup_reasons(config.STARTUP_REASONS)
         pcape.set_cape_time()
-        pcape.set_time(RESTART_TIME)
+        pcape.set_time(config.RESTART_TIME)
 
         supervisor.shutdown()
 
-    if not TESTING_NO_CELL:
+    if not config.TESTING_NO_CELL:
         # setup cell
-        cell_module_str, cell_method_str = CELL_TYPE.rsplit('.', 1)
+        cell_module_str, cell_method_str = config.CELL_TYPE.rsplit('.', 1)
 
         cell_module = importlib.import_module(cell_module_str)
         Cell_Modem = getattr(cell_module, cell_method_str)
@@ -314,20 +314,20 @@ if __name__ == '__main__':
     ser = ultrasound.serial_setup()
 
     # setup client for submission
-    client = Client(SUBMIT_URL, SUBMIT_ID, SUBMIT_KEY)
+    client = Client(config.SUBMIT_URL, config.SUBMIT_ID, config.SUBMIT_KEY)
 
-    if POWER_CONSERVE and not STOP:
-        pcape.set_wdt_power(WATCHDOG_STOP_POWER_TIMEOUT)
+    if config.POWER_CONSERVE and not STOP:
+        pcape.set_wdt_power(config.WATCHDOG_STOP_POWER_TIMEOUT)
         
-        for n in range(SAMPLES_PER_RUN):
+        for n in range(config.SAMPLES_PER_RUN):
             sensor_cycle(ser, client)
             
             log_network_info()
         
-        logger.info(f'Sensing for {PRE_SHUTDOWN_TIME} more seconds to allow communication.')
-        pcape.set_wdt_power(WATCHDOG_STOP_POWER_TIMEOUT)
+        logger.info(f'Sensing for {config.PRE_SHUTDOWN_TIME} more seconds to allow communication.')
+        pcape.set_wdt_power(config.WATCHDOG_STOP_POWER_TIMEOUT)
 
-        for n in range(PRE_SHUTDOWN_TIME // WAIT):
+        for n in range(config.PRE_SHUTDOWN_TIME // config.WAIT):
             sensor_cycle(ser, client)
 
             log_network_info()
@@ -335,10 +335,11 @@ if __name__ == '__main__':
         #pcape.set_time(WATCHDOG_START_POWER_TIMEOUT)
 
         if pcape.update_in_progress():
-            for x in range(MAX_UPDATE_WAIT // WAIT):
-                pcape.set_wdt_power(WATCHDOG_STOP_POWER_TIMEOUT)
-                logger.info(f'Update in progress: {pcape.update_percentage()}%. Giving it {MAX_UPDATE_WAIT} more seconds.')
-                MAX_UPDATE_WAIT -= WAIT
+            remaining_update_wait = config.MAX_UPDATE_WAIT
+            for x in range(remaining_update_wait // config.WAIT):
+                pcape.set_wdt_power(config.WATCHDOG_STOP_POWER_TIMEOUT)
+                logger.info(f'Update in progress: {pcape.update_percentage()}%. Giving it {remaining_update_wait} more seconds.')
+                remaining_update_wait -= config.WAIT
                 sensor_cycle(ser, client)
                 
                 log_network_info()
@@ -350,13 +351,13 @@ if __name__ == '__main__':
 
         client.send_all()
 
-        STOP = os.path.isfile(STORAGE_MOUNT_PATH + '/STOP')
+        STOP = os.path.isfile(config.STORAGE_MOUNT_PATH + '/STOP')
 
         if not STOP:
             # set startup reasons
-            pcape.set_startup_reasons(STARTUP_REASONS)
+            pcape.set_startup_reasons(config.STARTUP_REASONS)
             pcape.set_cape_time()
-            pcape.set_time(RESTART_TIME)
+            pcape.set_time(config.RESTART_TIME)
 
             logger.debug('Powercape info:')
             for line in pcape.powercape_info():

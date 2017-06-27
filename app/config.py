@@ -26,6 +26,8 @@ MIN_SAMPLES = int(os.environ.get('GAGE_MIN_SAMPLES', 10))
 MAX_ATTEMPTS = int(os.environ.get('GAGE_MAX_ATTEMPTS', 100))
 MAX_STD_DEV = int(os.environ.get('GAGE_MAX_STD_DEV', 100))
 
+
+# Sample submission server
 SUBMIT_ID = int(os.environ.get('GAGE_SUBMIT_ID'))
 SUBMIT_KEY = os.environ.get('GAGE_SUBMIT_KEY')
 SUBMIT_URL = os.environ.get('GAGE_SUBMIT_URL')
