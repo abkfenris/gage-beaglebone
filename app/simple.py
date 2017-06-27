@@ -6,7 +6,13 @@ from log import formatter, logger, log_levels
 import cell, config, power, pcape, supervisor, ultrasound
 from cell import sprint
 from gage_client.gage_client import Client
-from utils import log_network_info, mount_data_sd, sd_avaliable, uptime
+from utils import (
+    log_network_info, 
+    remove_old_log_files, 
+    mount_data_sd, 
+    sd_avaliable, 
+    uptime
+    )
     
 
 class SensorError(Exception):
@@ -89,15 +95,6 @@ def sensor_cycle(ser, client):
     writerow((date, distance, 'mm ultrasound', volts, flow, amps))
 
     time.sleep(config.WAIT)
-
-
-def remove_old_log_files():
-    """Removes log files older than MAX_LOG_FILES"""
-    ordered = sorted((config.DATA_CSV_FOLDER + filename for filename in os.listdir(config.DATA_CSV_FOLDER)), key=os.path.getctime, reverse=True)
-    old = ordered[config.MAX_LOG_FILES:]
-    for path in old:
-        logger.info(f'Removing log {path} as there are more than MAX_LOG_FILES ({config.MAX_LOG_FILES}).')
-        os.remove(path)
 
 
 if __name__ == '__main__':

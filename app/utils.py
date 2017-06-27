@@ -71,3 +71,12 @@ def mount_data_sd(path):
         logger.debug(f'MicroSD storage already mounted at {path}')
     else:
         logger.debug(f'MicroSD storage mounted at {path}')
+
+
+def remove_old_log_files():
+    """Removes log files older than MAX_LOG_FILES"""
+    ordered = sorted((config.DATA_CSV_FOLDER + filename for filename in os.listdir(config.DATA_CSV_FOLDER)), key=os.path.getctime, reverse=True)
+    old = ordered[config.MAX_LOG_FILES:]
+    for path in old:
+        logger.info(f'Removing log {path} as there are more than MAX_LOG_FILES ({config.MAX_LOG_FILES}).')
+        os.remove(path)
