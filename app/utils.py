@@ -3,6 +3,7 @@ Utility classes
 """
 import signal
 
+import cell
 
 class TimeoutError(Exception):
     pass
@@ -31,3 +32,15 @@ def uptime():
     """
     with open('/proc/uptime', 'r') as f:
         return float(f.readline().split()[0])
+
+
+def log_network_info(leds):
+    """ Log current network status and toggle LEDs """
+    connections = cell.list_active_connections()
+    for conn in connections:
+        logger.debug(conn)
+    
+    if len(connections) > 0:
+        leds.led_2 = True # network connection avaliable
+    else:
+        leds.led_2 = False
