@@ -2,11 +2,10 @@ import time, datetime, os, logging, subprocess, sys, statistics, csv, importlib
 import serial
 from logging.handlers import RotatingFileHandler
 
-import power, pcape, supervisor, cell
+import cell, config, power, pcape, supervisor
 from cell import sprint
 from gage_client.gage_client import Client
 from utils import uptime
-import config
 
 # Sensor Sampling Environment Variables
 PORT = os.environ.get('GAGE_SERIAL_PORT', '/dev/ttyS2')
@@ -111,22 +110,6 @@ def writerow(row):
             writer.writerow(row)
     else:
         logger.warning(f'DATA_CSV_PATH not avaliable, would have written: {row}')
-
-
-
-def serial_setup():
-    """ enable UART-2 device tree overlay in cape manager """
-    output = subprocess.run(
-        [f'''sh -c "echo 'BB-{UART}' > /sys/devices/platform/bone_capemgr/slots"'''], 
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-    if 'I/O error' in output.stderr.decode('utf-8'):
-        logger.info(f'{UART} already enabled in capemgr')
-    elif len(output.stderr) > 0:
-        logger.error(f'Other error occured adding {UART} to capemgr', output)
-    else:
-        logger.info(f'{UART} added to capemgr')
-    ser = serial.Serial(port=PORT, baudrate=9600, bytesize=8, parity='N', stopbits=1)
-    return ser
 
 
 def read_serial(ser):
@@ -328,7 +311,7 @@ if __name__ == '__main__':
         cell_modem = Cell_Modem()
     
     # setup serial
-    ser = serial_setup()
+    ser = ultrasonic.serial_setup()
 
     # setup client for submission
     client = Client(SUBMIT_URL, SUBMIT_ID, SUBMIT_KEY)
