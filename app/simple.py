@@ -216,7 +216,7 @@ if __name__ == '__main__':
             logger.debug(f'Created syslog directory {config.FILE_LOG_FOLDER}')
         
         # set up file logging
-        fh = RotatingFileHandler(config.FILE_LOG_FOLDER + 'syslog', maxBytes=10000000, backupCount=MAX_LOG_FILES)
+        fh = RotatingFileHandler(config.FILE_LOG_FOLDER + 'syslog', maxBytes=10000000, backupCount=config.MAX_LOG_FILES)
         fh.setLevel(log_levels.get(config.FILE_LOG_LEVEL, logging.DEBUG))
         fh.setFormatter(formatter)
         logger.addHandler(fh)
