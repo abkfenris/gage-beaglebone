@@ -3,7 +3,7 @@ Utility classes
 """
 import logging, os, signal, subprocess
 
-import cell
+import cell, config
 
 logger = logging.getLogger('gage')
 
