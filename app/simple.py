@@ -105,8 +105,8 @@ class TooFewSamples(SamplingError):
 
 def writerow(row):
     """Write a row to the current csv file"""
-    if config.DATA_CSV_PATH:
-        with open(config.DATA_CSV_PATH, 'a') as f:
+    if DATA_CSV_PATH:
+        with open(DATA_CSV_PATH, 'a') as f:
             writer = csv.writer(f)
             writer.writerow(row)
     else:
