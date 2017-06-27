@@ -288,7 +288,7 @@ if __name__ == '__main__':
         supervisor.shutdown()
 
     if uptime() > MAX_UPTIME and POWER_CONSERVE:
-        logger.error(f'System has been up for longer than the maximum allowed uptime ({uptime()} > {MAX_UPTIME}). Shutting down.')
+        logger.error(f'System has been up for longer than the maximum allowed uptime ({uptime()} > {MAX_UPTIME} seconds). Shutting down.')
 
         pcape.set_startup_reasons(STARTUP_REASONS)
         pcape.set_cape_time()
