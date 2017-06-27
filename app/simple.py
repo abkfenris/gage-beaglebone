@@ -2,7 +2,7 @@ import time, datetime, os, logging, subprocess, statistics, csv, importlib
 import serial
 from logging.handlers import RotatingFileHandler
 
-from log import logger, log_levels
+from log import formatter, logger, log_levels
 import cell, config, power, pcape, supervisor, ultrasound
 from cell import sprint
 from gage_client.gage_client import Client
