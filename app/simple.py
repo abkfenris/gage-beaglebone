@@ -47,10 +47,20 @@ MAX_UPTIME = int(os.environ.get('GAGE_MAX_UPTIME', WATCHDOG_STOP_POWER_TIMEOUT *
 # Logging levels
 STDOUT_LOG_LEVEL = os.environ.get('GAGE_STDOUT_LOG_LEVEL', 'WARNING').upper()
 FILE_LOG_LEVEL = os.environ.get('GAGE_FILE_LOG_LEVEL', 'INFO').upper()
+SENTRY_DSN = os.environ.get('SENTRY_DSN', False)
+SENTRY_LOG_LEVEL = os.environ.get('SENTRY_LOG_LEVEL', 'WARNING').upper()
 
 
 # Testing Environment Variables
 TESTING_NO_CELL = os.environ.get('TESTING_NO_CELL')
+
+# Environment Info
+RESIN_APP_NAME = os.environ.get('RESIN_APP_NAME')
+RESIN_DEVICE_NAME = os.environ.get('RESIN_DEVICE_NAME_AT_INIT')
+RESIN_PYTHON_VERSION = os.environ.get('PYTHON_VERSION')
+RESIN_SUPERVISOR_VERSION = os.environ.get('RESIN_SUPERVISOR_VERSION')
+RESIN_APP_RELEASE = os.environ.get('RESIN_APP_RELEASE')
+
 
 
 
@@ -70,6 +80,23 @@ ch.setLevel(log_levels.get(STDOUT_LOG_LEVEL, logging.WARNING))
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
+if SENTRY_DSN:
+    from raven import Client as Raven_Client
+    from raven.handlers.logging import SentryHandler
+
+    raven_client = Raven_Client(SENTRY_DSN, 
+                                name = RESIN_DEVICE_NAME,
+                                environment = RESIN_APP_NAME,
+                                auto_log_stacks = True,
+                                tags = {
+                                    'python version': RESIN_PYTHON_VERSION,
+                                    'supervisor version': RESIN_SUPERVISOR_VERSION,
+                                    'resin app release': RESIN_APP_RELEASE
+                                })
+    raven_handler = SentryHandler(raven_client)
+    raven_handler.setLevel(log_levels.get(SENTRY_LOG_LEVEL, logging.WARNING))
+
+    logger.addHandler(raven_handler)
 
 class SensorError(Exception):
     pass
