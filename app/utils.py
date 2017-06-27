@@ -53,3 +53,21 @@ def sd_avaliable():
     """ Returns True if the SD card block device is avaliable to the system """
     output = subprocess.run('fdisk -l', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return 'mmcblk0' in output.stdout.decode('ASCII')
+
+
+def mount_data_sd(path):
+    """Mounts the microsd card for data storage at given path"""
+    try:
+        os.mkdir(path)
+    except OSError:
+        logger.debug(f'{path} already exists. Storage should be mounted')
+    else:
+        logger.debug(f'Created mount point for microSD at {path}')
+    
+    output = subprocess.run([f'mount {path}'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    if f"mount can't find {path} in /etc/fstab" in output.stderr.decode('ASCII'):
+        logger.error("/etc/fstab doesn't include mount {path}")
+    elif f'is already mounted on {path}' in output.stderr.decode('ASCII'):
+        logger.debug(f'MicroSD storage already mounted at {path}')
+    else:
+        logger.debug(f'MicroSD storage mounted at {path}')
