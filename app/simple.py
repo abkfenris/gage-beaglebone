@@ -5,6 +5,7 @@ from logging.handlers import RotatingFileHandler
 import power, pcape, supervisor, cell
 from cell import sprint
 from gage_client.gage_client import Client
+from utils import uptime
 
 # Sensor Sampling Environment Variables
 PORT = os.environ.get('GAGE_SERIAL_PORT', '/dev/ttyS2')
@@ -41,6 +42,7 @@ WATCHDOG_STOP_POWER_TIMEOUT = int(os.environ.get('GAGE_WATCHDOG_STOP_POWER_TIMEO
 WATCHDOG_START_POWER_TIMEOUT = int(os.environ.get('GAGE_WATCHDOG_START_POWER_TIMEOUT', 120))
 STARTUP_REASONS = os.environ.get('GAGE_STARTUP_REASONS', '0x09')
 
+MAX_UPTIME = int(os.environ.get('GAGE_MAX_UPTIME', WATCHDOG_STOP_POWER_TIMEOUT * 2))
 
 # Logging levels
 STDOUT_LOG_LEVEL = os.environ.get('GAGE_STDOUT_LOG_LEVEL', 'WARNING').upper()
@@ -279,6 +281,15 @@ if __name__ == '__main__':
     if power.checkVolts() < MIN_VOLTAGE:
         logger.error(f'System voltage has fallen below minimum voltage specified ({MIN_VOLTAGE} V). Shutting down for {MIN_VOLTAGE_RESTART_TIME} min to charge.')
         
+        pcape.set_startup_reasons(STARTUP_REASONS)
+        pcape.set_cape_time()
+        pcape.set_time(MIN_VOLTAGE_RESTART_TIME)
+
+        supervisor.shutdown()
+
+    if uptime() > MAX_UPTIME and POWER_CONSERVE:
+        logger.error(f'System has been up for longer than the maximum allowed uptime ({uptime()} > {MAX_UPTIME}). Shutting down.')
+
         pcape.set_startup_reasons(STARTUP_REASONS)
         pcape.set_cape_time()
         pcape.set_time(MIN_VOLTAGE_RESTART_TIME)

@@ -23,3 +23,11 @@ class Timeout(object):
 
     def __exit__(self, exc_type, exc_value, traceback):
         signal.alarm(0)
+
+
+def uptime():
+    """
+    Return the uptime in seconds (float) since last boot
+    """
+    with open('/proc/uptime', 'r') as f:
+        return float(f.readline().split()[0])
