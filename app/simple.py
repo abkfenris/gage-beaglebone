@@ -6,7 +6,7 @@ from log import formatter, logger, log_levels
 import cell, config, power, pcape, supervisor, ultrasound
 from cell import sprint
 from gage_client.gage_client import Client
-from utils import log_network_info, sd_avaliable, sd_avaliable
+from utils import log_network_info, sd_avaliable, uptime
     
 
 class SensorError(Exception):
