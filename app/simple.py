@@ -2,7 +2,7 @@ import time, datetime, os, logging, subprocess, sys, statistics, csv, importlib
 import serial
 from logging.handlers import RotatingFileHandler
 
-import cell, config, power, pcape, supervisor
+import cell, config, power, pcape, supervisor, ultrasound
 from cell import sprint
 from gage_client.gage_client import Client
 from utils import uptime
@@ -311,7 +311,7 @@ if __name__ == '__main__':
         cell_modem = Cell_Modem()
     
     # setup serial
-    ser = ultrasonic.serial_setup()
+    ser = ultrasound.serial_setup()
 
     # setup client for submission
     client = Client(SUBMIT_URL, SUBMIT_ID, SUBMIT_KEY)
