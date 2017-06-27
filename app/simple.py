@@ -6,7 +6,7 @@ from log import logger, log_levels
 import cell, config, power, pcape, supervisor, ultrasound
 from cell import sprint
 from gage_client.gage_client import Client
-from utils import uptime, log_network_info
+from utils import log_network_info, sd_avaliable, sd_avaliable
     
 
 class SensorError(Exception):
@@ -119,12 +119,6 @@ def mount_data_sd(path):
         logger.debug(f'MicroSD storage already mounted at {path}')
     else:
         logger.debug(f'MicroSD storage mounted at {path}')
-    
-
-def sd_avaliable():
-    """ Returns True if the SD card block device is avaliable to the system """
-    output = subprocess.run('fdisk -l', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    return 'mmcblk0' in output.stdout.decode('ASCII')
 
 
 def remove_old_log_files():

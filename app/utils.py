@@ -1,7 +1,7 @@
 """
 Utility classes
 """
-import logging, signal
+import logging, signal, subprocess
 
 import cell
 
@@ -47,3 +47,9 @@ def log_network_info(leds):
         leds.led_2 = True # network connection avaliable
     else:
         leds.led_2 = False
+
+
+def sd_avaliable():
+    """ Returns True if the SD card block device is avaliable to the system """
+    output = subprocess.run('fdisk -l', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    return 'mmcblk0' in output.stdout.decode('ASCII')
