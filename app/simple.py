@@ -135,7 +135,7 @@ def sensor_cycle(ser, client):
     logger.info(f'{distance}mm {volts}v {flow} {amps}ma')
     writerow((date, distance, 'mm ultrasound', volts, flow, amps))
 
-    time.sleep(WAIT)
+    time.sleep(config.WAIT)
 
 
 def mount_data_sd(path):
@@ -248,7 +248,7 @@ if __name__ == '__main__':
         pcape.set_startup_reasons(config.STARTUP_REASONS)
         pcape.set_cape_time()
         pcape.set_time(config.RESTART_TIME)
-        
+
         logger.error(f'System has been up for longer than the maximum allowed uptime ({uptime()} > {config.MAX_UPTIME} seconds). Shutting down.')
 
         
