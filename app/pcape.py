@@ -227,9 +227,11 @@ def update_percentage():
 class StatusLEDs(object):
     """Lets you change the Powercape LEDs for showing board status"""
     def __init__(self):
-        self.initial_register_value = 1 # powercapeI2C.readU8(3) assuming it's always 1 until known otherwise
+        self.initial_register_value = 1 # 1 for charging
         self._led_1 = False
         self._led_2 = False
+        powercapeI2C.write8(3, 0) # toggle charging off for a moment
+        powercapeI2C.write8(3, 1) # toggle it back on to extend charging
     
     def set_leds(self):
         """Sets the LEDS to be illuminated or not and preserves the origional value"""
