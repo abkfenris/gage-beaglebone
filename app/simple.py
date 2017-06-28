@@ -11,6 +11,7 @@ from logging.handlers import RotatingFileHandler
 from app import config, db, pcape, power, supervisor, ultrasound
 from app.exceptions import SamplingError
 from app.gage_client.gage_client import Client
+from app.gage_client.gage_client.client import SendError
 from app.log import formatter, log_levels, logger
 from app.utils import (clean_sample_mean, log_network_info, mount_data_sd,
                        remove_old_log_files, sd_avaliable, uptime, writerow)
@@ -164,8 +165,11 @@ def main():
                     break
         else:
             logger.debug('No update scheduled, getting ready to shutdown')
-
-        client.send_all()
+        
+        try:
+            client.send_all()
+        except SendError:
+            logger.warning('Unable to send samples')
 
         STOP = os.path.isfile(config.STORAGE_MOUNT_PATH + '/STOP')
 
