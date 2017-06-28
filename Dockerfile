@@ -41,4 +41,5 @@ COPY app /gage/app
 
 #CMD while : ; do echo "Idling..."; sleep ${INTERVAL=600}; done
 
-CMD python /gage/app/simple.py
+WORKDIR /gage
+CMD python app/simple.py
