@@ -255,3 +255,12 @@ class StatusLEDs(object):
         """ Set to True to toggle LED 2 on """
         self._led_2 = value
         self.set_leds()
+
+
+def schedule_restart(startup_reasons, restart_time):
+    """
+    Schedule a restart
+    """
+    set_startup_reasons(startup_reasons)
+    set_cape_time()
+    set_time(restart_time)

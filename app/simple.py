@@ -51,14 +51,10 @@ def sensor_cycle(ser, client, data_csv_path):
 
 
 if __name__ == '__main__':
-    #if POWER_CONSERVE:
-    #    pcape.set_wdt_power(WATCHDOG_POWER_TIMEOUT)
-    
     pcape.set_system_time()
     pcape.set_wdt_power(config.WATCHDOG_STOP_POWER_TIMEOUT)
     pcape.set_wdt_start(config.WATCHDOG_START_POWER_TIMEOUT)
     
-
     leds = pcape.StatusLEDs()
     leds.led_1, leds.led_2 = False, False
 
@@ -105,22 +101,12 @@ if __name__ == '__main__':
     
     if power.checkVolts() < config.MIN_VOLTAGE:
         logger.error(f'System voltage has fallen below minimum voltage specified ({MIN_VOLTAGE} V). Shutting down for {MIN_VOLTAGE_RESTART_TIME} min to charge.')
-        
-        pcape.set_startup_reasons(config.STARTUP_REASONS)
-        pcape.set_cape_time()
-        pcape.set_time(config.MIN_VOLTAGE_RESTART_TIME)
-
+        pcape.schedule_restart(config.STARTUP_REASONS, config.MIN_VOLTAGE_RESTART_TIME)
         supervisor.shutdown()
 
     if uptime() > config.MAX_UPTIME and config.POWER_CONSERVE:
-        pcape.set_startup_reasons(config.STARTUP_REASONS)
-        pcape.set_cape_time()
-        pcape.set_time(config.RESTART_TIME)
-
+        pcape.schedule_restart(config.STARTUP_REASONS, config.RESTART_TIME)
         logger.error(f'System has been up for longer than the maximum allowed uptime ({uptime()} > {config.MAX_UPTIME} seconds). Shutting down.')
-
-        
-
         supervisor.shutdown()
 
     if not config.TESTING_NO_CELL:
@@ -143,7 +129,6 @@ if __name__ == '__main__':
         
         for n in range(config.SAMPLES_PER_RUN):
             sensor_cycle(ser, client, data_csv_path)
-            
             log_network_info(leds)
         
         logger.info(f'Sensing for {config.PRE_SHUTDOWN_TIME} more seconds to allow communication.')
@@ -163,7 +148,6 @@ if __name__ == '__main__':
                 logger.info(f'Update in progress: {pcape.update_percentage()}%. Giving it {remaining_update_wait} more seconds.')
                 remaining_update_wait -= config.WAIT
                 sensor_cycle(ser, client, data_csv_path)
-                
                 log_network_info(leds)
 
                 if not pcape.update_in_progress():
@@ -176,10 +160,7 @@ if __name__ == '__main__':
         STOP = os.path.isfile(config.STORAGE_MOUNT_PATH + '/STOP')
 
         if not STOP:
-            # set startup reasons
-            pcape.set_startup_reasons(config.STARTUP_REASONS)
-            pcape.set_cape_time()
-            pcape.set_time(config.RESTART_TIME)
+            pcape.schedule_restart(config.STARTUP_REASONS, config.RESTART_TIME)
 
             logger.debug('Powercape info:')
             for line in pcape.powercape_info():
@@ -192,5 +173,4 @@ if __name__ == '__main__':
     else:
         while True:
             sensor_cycle(ser, client, data_csv_path)
-
             log_network_info()
