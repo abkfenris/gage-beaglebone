@@ -107,48 +107,6 @@ def set_startup_reasons(startup_reasons):
         pass
 
 
-def reboot():
-    """
-    Send resin supervisor reboot command
-    """
-    if RESIN_SUPERVISOR_ADDRESS and RESIN_SUPERVISOR_API_KEY:
-        res = requests.post(
-            f'{RESIN_SUPERVISOR_ADDRESS}/v1/reboot?apikey={RESIN_SUPERVISOR_API_KEY}', 
-            headers={'Content-Type': 'application/json'})
-        try:
-            if res.json()['Data'] != 'OK':
-                logger.error(f'Resin supervisor did not respond with "Data":"OK" Response was: {res.json()}')
-            else:
-                logger.debug('Resin supervisor responded "OK" to reboot request')
-        except KeyError:
-            logger.error('No "Data" key in Resin supervisor response.')
-    else:
-        logger.error('RESIN_SUPERVISOR_ADDRESS or RESIN_SUPERVISOR_API_KEY not in environment')
-    logger.info('Setting powercape to cut power in 60 seconds if still running')
-    set_wdt_stop(60)  # cut power in 60 seconds if still running.
-
-
-def shutdown():
-    """
-    Send resin supervisor shutdown command
-    """
-    if RESIN_SUPERVISOR_ADDRESS and RESIN_SUPERVISOR_API_KEY:
-        res = requests.post(
-            f'{RESIN_SUPERVISOR_ADDRESS}/v1/shutdown?apikey={RESIN_SUPERVISOR_API_KEY}',
-            headers={'Content-Type': 'application/json'})
-        try:
-            if res.json()['Data'] != 'OK':
-                logger.error(f'Resin supervisor did not respond with "DATA":"OK". Response was: {res.json()}')
-            else:
-                logger.debug('Resin supervisor responded "OK" to reboot request')
-        except KeyError:
-            logger.error('No "DATA" key in Resin supervisor response')
-    else:
-        logger.error('RESIN_SUPERVISOR_ADDRESS or RESIN_SUPERVISOR_API_KEY not in environment')
-    logger.info('Setting powercape to cut power in 60 seconds in still running')
-    set_wdt_stop(60)
-
-
 def cape_time():
     """
     Get the current time from the cape as a datetime object
@@ -188,45 +146,6 @@ def powercape_info():
                                      stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                      shell=True)
     return output.stdout.decode('ASCII').splitlines()
-
-
-def update_in_progress():
-    """
-    Returns true if the resin supervisor is in the process
-    of downloading an update
-    """
-    if RESIN_SUPERVISOR_ADDRESS and RESIN_SUPERVISOR_API_KEY:
-        try:
-            res = requests.get(f'{RESIN_SUPERVISOR_ADDRESS}/v1/device?apikey={RESIN_SUPERVISOR_API_KEY}',
-                               headers={'Content-Type': 'application/json'})
-        except requests.exceptions.ConnectionError:
-            logger.error('Supervisor offline. Gage most likely does not have a connection')
-            return False
-        try:
-            return (res.json()['status'] == 'Downloading'
-                    or res.json()['update_pending']
-                    or res.json()['update_downloaded'])
-        except KeyError:
-            logger.error('Unknown response from Resin supervisor')
-            return False
-    else:
-        logger.error('RESIN_SUPERVISOR ADDRESS or RESIN_SUPERVISOR_API_KEY not set')
-        return False
-
-
-def update_percentage():
-    """
-    Returns percent of update downloaded
-    """
-    if RESIN_SUPERVISOR_ADDRESS and RESIN_SUPERVISOR_API_KEY:
-        res = requests.get(f'{RESIN_SUPERVISOR_ADDRESS}/v1/device?apikey={RESIN_SUPERVISOR_API_KEY}',
-                           headers={'Content-Type': 'application/json'})
-        try:
-            return res.json()['download_progress']
-        except KeyError:
-            logger.error('Unknown response from Resin supervisor')
-    else:
-        logger.error('RESIN_SUPERVISOR ADDRESS or RESIN_SUPERVISOR_API_KEY not set')
 
 
 class StatusLEDs(object):

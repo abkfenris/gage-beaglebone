@@ -4,23 +4,16 @@ Main script for gage to run. No longer simple.
 import datetime
 import importlib
 import logging
-from logging.handlers import RotatingFileHandler
 import os
 import time
+from logging.handlers import RotatingFileHandler
 
-from app.log import formatter, logger, log_levels
-from . import config, db, power, pcape, supervisor, ultrasound
-from .gage_client.gage_client import Client
-from .utils import (
-    clean_sample_mean,
-    log_network_info,
-    remove_old_log_files,
-    mount_data_sd,
-    sd_avaliable,
-    writerow,
-    uptime
-    )
+from app import config, db, pcape, power, supervisor, ultrasound
 from app.exceptions import SamplingError
+from app.gage_client.gage_client import Client
+from app.log import formatter, log_levels, logger
+from app.utils import (clean_sample_mean, log_network_info, mount_data_sd,
+                       remove_old_log_files, sd_avaliable, uptime, writerow)
 
 
 def sensor_cycle(ser, client, data_csv_path):
@@ -157,17 +150,17 @@ def main():
 
             log_network_info(leds)
 
-        if pcape.update_in_progress():
+        if supervisor.update_in_progress():
             remaining_update_wait = config.MAX_UPDATE_WAIT
             for x in range(remaining_update_wait // config.WAIT):
                 pcape.set_wdt_power(config.WATCHDOG_STOP_POWER_TIMEOUT)
-                logger.info(f'Update in progress: {pcape.update_percentage()}%.',
+                logger.info(f'Update in progress: {supervisor.update_percentage()}%.',
                             f'Giving it {remaining_update_wait} more seconds.')
                 remaining_update_wait -= config.WAIT
                 sensor_cycle(ser, client, data_csv_path)
                 log_network_info(leds)
 
-                if not pcape.update_in_progress():
+                if not supervisor.update_in_progress():
                     break
         else:
             logger.debug('No update scheduled, getting ready to shutdown')
