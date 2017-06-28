@@ -1,49 +1,41 @@
-#!/usr/bin/python
-import Adafruit_BBIO.GPIO as GPIO
-import Adafruit_BBIO.UART as UART
-import serial  # aka pyserial
-import time
-from numpy import mean
-import config
+"""
+Ultrasonic sensor functions
+"""
+
 import logging
+import subprocess
+
+import serial
+
+from app import config
+from app import exceptions
 
 logger = logging.getLogger('gage')
 
-UART.setup(config.DepthUART)
 
-# GPIO.setup(config.DepthGPIO, GPIO.OUT)
+def serial_setup():
+    """ enable UART-2 device tree overlay in cape manager """
+    output = subprocess.run(
+        [f'''sh -c "echo 'BB-{config.UART}' > /sys/devices/platform/bone_capemgr/slots"'''],
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    if 'I/O error' in output.stderr.decode('utf-8'):
+        logger.info(f'{config.UART} already enabled in capemgr')
+    elif len(output.stderr) > 0:
+        logger.error(f'Other error occured adding {config.UART} to capemgr', output)
+    else:
+        logger.info(f'{config.UART} added to capemgr')
+    ser = serial.Serial(port=config.PORT, baudrate=9600, bytesize=8, parity='N', stopbits=1)
+    return ser
 
-ser = serial.Serial()
-ser.port = config.SerialDev
-ser.baudrate = 9600
-ser.bytesize = serial.EIGHTBITS
-ser.parity = serial.PARITY_NONE
-ser.stopbits = serial.STOPBITS_ONE
 
-
-def checkDepth(samples=3):
-
-    currentDepthList = []  # create an empty array to store the depth values
-
-    # GPIO.output(config.DepthGPIO, GPIO.HIGH)
-    # use GPIO to Pin 4 on Ultrasonic sensor to turn ranging on and off (and
-    # therefore save power)
-
-    time.sleep(.5)  # give time for the sensor to wake up and start
-
-    for i in range(0, samples):
-        ser.open()
-        ser.flushOutput()
+def read_serial(ser):
+    """Make 50 attempts to read the sensor serial data. Returns the first valid response"""
+    for _ in range(50):
         ser.flushInput()
-        try:
-            currentDepthList.append(int(ser.read(5)[1:4]))
-        except ValueError:
-            ser.flushInput()
-        ser.close()
-
-        time.sleep(.5)  # Take a half second between reading ranges
-
-    # GPIO.output(config.DepthGPIO, GPIO.LOW)
-    currentDepth = mean(currentDepthList)
-    logger.info('%s mean found from %s', currentDepth, currentDepthList)
-    return currentDepth
+        data = ser.read(5).decode('ASCII')
+        if len(data) == 5:
+            if data[0] == 'R' and data[1:5].isdigit():  # and data[1:5] != '9999'
+                return int(data[1:5])
+        logger.debug('Serial returned invalid info, trying again')
+    logger.error('Serial did not return valid info in 50 tries')
+    raise exceptions.SensorError
