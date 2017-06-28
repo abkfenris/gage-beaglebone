@@ -8,7 +8,7 @@ from logging.handlers import RotatingFileHandler
 import os
 import time
 
-from .log import formatter, logger, log_levels
+from app.log import formatter, logger, log_levels
 from . import config, db, power, pcape, supervisor, ultrasound
 from .gage_client.gage_client import Client
 from .utils import (

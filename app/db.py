@@ -4,7 +4,7 @@ Database models for sample collection
 import peewee as pw
 from playhouse.sqlite_ext import SqliteExtDatabase
 
-from . import config
+from app import config
 
 db = SqliteExtDatabase(config.DATA_CSV_FOLDER + 'sample_database.sqlite')
 

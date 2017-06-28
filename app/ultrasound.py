@@ -7,8 +7,8 @@ import subprocess
 
 import serial
 
-from . import config
-from . import exceptions
+from app import config
+from app import exceptions
 
 logger = logging.getLogger('gage')
 

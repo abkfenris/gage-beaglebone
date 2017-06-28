@@ -4,7 +4,7 @@ Shared logger
 import logging
 import sys
 
-import .config
+from app import config
 
 log_levels = {'DEBUG': logging.DEBUG,
               'INFO': logging.INFO,

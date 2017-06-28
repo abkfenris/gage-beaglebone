@@ -8,7 +8,7 @@ import signal
 import statistics
 import subprocess
 
-from . import cell, config, exceptions
+from app import cell, config, exceptions
 
 logger = logging.getLogger('gage')
 
