@@ -28,14 +28,15 @@ RUN git apply /gage/fix_powercape.patch
 WORKDIR /gage/PowerCape/utils
 RUN make
 
-WORKDIR /gage
-COPY /app/requirements.txt /gage
-RUN pip install --no-cache-dir -r /gage/requirements.txt
+WORKDIR /gage/app
 
 RUN echo "LABEL=GAGEDATA /mnt/gagedata vfat defaults" >> /etc/fstab
 
-COPY app /gage
+COPY /app/requirements.txt /gage/app
+RUN pip install --no-cache-dir -r /gage/app/requirements.txt
+
+COPY app /gage/app
 
 #CMD while : ; do echo "Idling..."; sleep ${INTERVAL=600}; done
 
-CMD python simple.py
+CMD python /gage/app/simple.py

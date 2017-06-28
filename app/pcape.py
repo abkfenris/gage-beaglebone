@@ -230,6 +230,7 @@ class StatusLEDs(object):
         self.initial_register_value = 1 # 1 for charging
         self._led_1 = False
         self._led_2 = False
+        logger.info('Toggling charge controller to extend charge time')
         powercapeI2C.write8(3, 0) # toggle charging off for a moment
         powercapeI2C.write8(3, 1) # toggle it back on to extend charging
     
