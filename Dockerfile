@@ -28,9 +28,11 @@ RUN git apply /gage/fix_powercape.patch
 WORKDIR /gage/PowerCape/utils
 RUN make
 
-WORKDIR /gage/app
-
+# set label for SD card so that we can mount it
 RUN echo "LABEL=GAGEDATA /mnt/gagedata vfat defaults" >> /etc/fstab
+
+RUN mkdir /gage/app
+WORKDIR /gage/app
 
 COPY /app/requirements.txt /gage/app
 RUN pip install --no-cache-dir -r /gage/app/requirements.txt
