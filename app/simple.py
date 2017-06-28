@@ -7,63 +7,16 @@ import cell, config, power, pcape, supervisor, ultrasound
 from cell import sprint
 from gage_client.gage_client import Client
 from utils import (
+    clean_sample_mean,
     log_network_info, 
     remove_old_log_files, 
     mount_data_sd, 
     sd_avaliable, 
+    writerow,
     uptime
     )
-    
+from exceptions import SensorError, SamplingError, TooFewSamples
 
-class SensorError(Exception):
-    pass
-
-class SamplingError(Exception):
-    pass
-
-class TooFewSamples(SamplingError):
-    pass
-
-
-def writerow(row, data_csv_path):
-    """Write a row to the current csv file"""
-    if data_csv_path:
-        with open(data_csv_path, 'a') as f:
-            writer = csv.writer(f)
-            writer.writerow(row)
-    else:
-        logger.warning(f'DATA_CSV_PATH not avaliable, would have written: {row}')
-
-
-def clean_sample_mean(sample_func, ser, low, high, min_samples, max_attempts, max_std_dev):
-    """With a given sampling_func, sample and discard outliers"""
-    samples = [sample_func(ser)] # initial sample so that stdev doesn't yell at us for too few samples
-
-    for n in range(max_attempts):
-        samples.append(sample_func(ser))
-
-        cleaned_low_high = [s for s in samples if low <= s <= high]
-        try:
-            cleaned = [s for s 
-                        in cleaned_low_high 
-                        if abs(statistics.mean(cleaned_low_high) - s) < 2 * statistics.stdev(cleaned_low_high)]
-        except statistics.StatisticsError:
-            cleaned = []
-
-        if len(cleaned) >= min_samples:
-            if statistics.stdev(cleaned) < max_std_dev:
-                return statistics.mean(cleaned)
-    
-    if len(cleaned) < min_samples:
-        if low in samples:
-            raise TooFewSamples(f'Too few cleaned samples that were not too low ({low})')
-        elif high in samples:
-            raise TooFewSamples(f'Too few cleaned samples that were not too high ({high})')
-        else:
-            raise TooFewSamples('Too few cleaned samples')
-    
-    stdev = round(statistics.stdev(cleaned), 2)
-    raise SamplingError(f'Stdev ({stdev}) did not meet criteria ({max_std_dev}) in {max_attempts}')
 
 def sensor_cycle(ser, client, data_csv_path):
     """Collect and log sensor data once"""
@@ -147,7 +100,7 @@ if __name__ == '__main__':
         leds.led_1 = True # SD Card mounted and avaliable for storage
     else:
         logger.error('Micro SD card not avaliable for file storage')
-        DATA_CSV_PATH = False
+        data_csv_path = False
         STOP = False
     
     if power.checkVolts() < config.MIN_VOLTAGE:
