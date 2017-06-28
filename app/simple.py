@@ -61,7 +61,10 @@ def sensor_cycle(ser, client, data_csv_path):
     time.sleep(config.WAIT)
 
 
-if __name__ == '__main__':
+def main():
+    """
+    Run the main stuff
+    """
     pcape.set_system_time()
     pcape.set_wdt_power(config.WATCHDOG_STOP_POWER_TIMEOUT)
     pcape.set_wdt_start(config.WATCHDOG_START_POWER_TIMEOUT)
@@ -188,3 +191,6 @@ if __name__ == '__main__':
         while True:
             sensor_cycle(ser, client, data_csv_path)
             log_network_info()
+
+if __name__ == '__main__':
+    main()
