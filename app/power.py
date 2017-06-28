@@ -10,7 +10,7 @@ import subprocess
 SLEEP_TIME = .01
 PATH = '/gage/PowerCape/utils/ina219'
 
-def checkPower(j=3):
+def check_power(j=3):
     """
     Really a dupe of checkVolts
     """
@@ -25,7 +25,7 @@ def checkPower(j=3):
     return currentPower
 
 
-def checkVolts(j=3):
+def check_volts(j=3):
     """
     Return the current bus voltage (Battery Voltage)
     """
@@ -42,7 +42,7 @@ def checkVolts(j=3):
     return currentVolts
 
 
-def checkAmps(j=3):
+def check_amps(j=3):
     """
     Return the current bus miliamphrage
     Positive is discharging the battery, negative is chargine

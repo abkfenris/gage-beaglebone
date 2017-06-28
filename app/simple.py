@@ -40,8 +40,8 @@ def sensor_cycle(ser, client, data_csv_path):
         logger.error(f'{date} - Sampling error - {error}')
         distance = None
     date = datetime.datetime.now()
-    volts = round(power.checkVolts(), 2)
-    amps = round(power.checkAmps(), 2)
+    volts = round(power.check_volts(), 2)
+    amps = round(power.check_amps(), 2)
 
     if distance:
         client.reading('level', str(date), distance)
@@ -106,13 +106,13 @@ if __name__ == '__main__':
         data_csv_path = config.DATA_CSV_FOLDER + datetime.date.today().isoformat() + '.csv'
 
         leds.led_1 = True  # SD Card mounted and avaliable for storage
-        db.create_tables([Sample], safe=True)
+        db.create_tables([db.Sample], safe=True)
     else:
         logger.error('Micro SD card not avaliable for file storage')
         data_csv_path = False
         STOP = False
 
-    if power.checkVolts() < config.MIN_VOLTAGE:
+    if power.check_volts() < config.MIN_VOLTAGE:
         logger.error(f'System voltage has fallen below minimum voltage specified ({config.MIN_VOLTAGE} V).',
                      f'Shutting down for {config.MIN_VOLTAGE_RESTART_TIME} min to charge.')
         pcape.schedule_restart(config.STARTUP_REASONS, config.MIN_VOLTAGE_RESTART_TIME)
