@@ -1,6 +1,11 @@
+"""
+Functions for reading power usage
+"""
 #!/usr/bin/python
 
-import time, statistics, subprocess
+import time
+import statistics
+import subprocess
 
 SLEEP_TIME = .01
 PATH = '/gage/PowerCape/utils/ina219'

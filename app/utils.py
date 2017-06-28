@@ -1,9 +1,14 @@
 """
 Utility classes
 """
-import csv, logging, os, signal, statistics, subprocess
+import csv
+import logging
+import os
+import signal
+import statistics
+import subprocess
 
-import cell, config, exceptions
+from app import cell, config, exceptions
 
 logger = logging.getLogger('gage')
 
@@ -44,7 +49,7 @@ def log_network_info(leds):
         logger.debug(conn)
     
     if len(connections) > 0:
-        leds.led_2 = True # network connection avaliable
+        leds.led_2 = True  # network connection avaliable
     else:
         leds.led_2 = False
 
@@ -63,7 +68,7 @@ def mount_data_sd(path):
         logger.debug(f'{path} already exists. Storage should be mounted')
     else:
         logger.debug(f'Created mount point for microSD at {path}')
-    
+
     output = subprocess.run([f'mount {path}'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     if f"mount can't find {path} in /etc/fstab" in output.stderr.decode('ASCII'):
         logger.error("/etc/fstab doesn't include mount {path}")
@@ -75,7 +80,8 @@ def mount_data_sd(path):
 
 def remove_old_log_files():
     """Removes log files older than MAX_LOG_FILES"""
-    ordered = sorted((config.DATA_CSV_FOLDER + filename for filename in os.listdir(config.DATA_CSV_FOLDER)), key=os.path.getctime, reverse=True)
+    ordered = sorted((config.DATA_CSV_FOLDER + filename for filename in os.listdir(config.DATA_CSV_FOLDER)),
+                     key=os.path.getctime, reverse=True)
     old = ordered[config.MAX_LOG_FILES:]
     for path in old:
         logger.info(f'Removing log {path} as there are more than MAX_LOG_FILES ({config.MAX_LOG_FILES}).')
@@ -94,23 +100,23 @@ def writerow(row, data_csv_path):
 
 def clean_sample_mean(sample_func, ser, low, high, min_samples, max_attempts, max_std_dev):
     """With a given sampling_func, sample and discard outliers"""
-    samples = [sample_func(ser)] # initial sample so that stdev doesn't yell at us for too few samples
+    samples = [sample_func(ser)]  # initial sample so that stdev doesn't yell at us for too few samples
 
     for n in range(max_attempts):
         samples.append(sample_func(ser))
 
         cleaned_low_high = [s for s in samples if low <= s <= high]
         try:
-            cleaned = [s for s 
-                        in cleaned_low_high 
-                        if abs(statistics.mean(cleaned_low_high) - s) < 2 * statistics.stdev(cleaned_low_high)]
+            cleaned = [s for s
+                       in cleaned_low_high
+                       if abs(statistics.mean(cleaned_low_high) - s) < 2 * statistics.stdev(cleaned_low_high)]
         except statistics.StatisticsError:
             cleaned = []
 
         if len(cleaned) >= min_samples:
             if statistics.stdev(cleaned) < max_std_dev:
                 return statistics.mean(cleaned)
-    
+
     if len(cleaned) < min_samples:
         if low in samples:
             raise exceptions.TooFewSamples(f'Too few cleaned samples that were not too low ({low})')
@@ -118,6 +124,6 @@ def clean_sample_mean(sample_func, ser, low, high, min_samples, max_attempts, ma
             raise exceptions.TooFewSamples(f'Too few cleaned samples that were not too high ({high})')
         else:
             raise exceptions.TooFewSamples('Too few cleaned samples')
-    
+
     stdev = round(statistics.stdev(cleaned), 2)
     raise exceptions.SamplingError(f'Stdev ({stdev}) did not meet criteria ({max_std_dev}) in {max_attempts}')
