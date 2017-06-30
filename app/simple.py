@@ -1,18 +1,32 @@
 """
 Main script for gage to run. No longer simple.
 """
+import sys
+import time
+
+from app.log import logger
+
+
+def log_uncaught_exceptions(exc_type, exc_value, tb):
+    import traceback
+    sleep_time = 180
+    logger.critical(f'Uncaught exception, sleeping for {sleep_time} to allow updates', exc_info(exc_type, exc_value, tb))
+    time.sleep(sleep_time)
+
+sys.excepthook = log_uncaught_exceptions
+    
+
 import datetime
 import importlib
 import logging
 import os
-import time
 from logging.handlers import RotatingFileHandler
 
 from app import config, pcape, power, supervisor, ultrasound
 from app.exceptions import SamplingError
 from app.gage_client.gage_client import Client
 from app.gage_client.gage_client.client import SendError
-from app.log import formatter, log_levels, logger
+from app.log import formatter, log_levels
 from app.utils import (clean_sample_mean, log_network_info, mount_data_sd,
                        remove_old_log_files, sd_avaliable, uptime, writerow)
 
@@ -104,7 +118,7 @@ def main():
 
         leds.led_1 = True  # SD Card mounted and avaliable for storage
 
-        from app.db import db, Sample
+        from db import db, Sample
 
         db.connect()
         db.create_tables([Sample], safe=True)
