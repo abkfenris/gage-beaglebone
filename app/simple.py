@@ -7,13 +7,13 @@ import time
 from app.log import logger
 
 
-'''def log_uncaught_exceptions(exc_type, exc_value, tb):
+def log_uncaught_exceptions(exc_type, exc_value, tb):
     import traceback
     sleep_time = 180
     logger.critical(f'Uncaught exception, sleeping for {sleep_time} to allow updates', exc_info(exc_type, exc_value, tb))
     time.sleep(sleep_time)
 
-sys.excepthook = log_uncaught_exceptions'''
+sys.excepthook = log_uncaught_exceptions
     
 
 import datetime
