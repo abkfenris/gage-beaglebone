@@ -104,7 +104,7 @@ def main():
 
         leds.led_1 = True  # SD Card mounted and avaliable for storage
 
-        from db import db
+        from app.db import db, Sample
 
         db.connect()
         db.create_tables([db.Sample], safe=True)
