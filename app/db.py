@@ -1,8 +1,6 @@
 """
 Database models for sample collection
 """
-import logging
-
 import peewee as pw
 from playhouse.sqlite_ext import SqliteExtDatabase
 
@@ -10,8 +8,6 @@ from app import config
 
 DB_PATH = config.DATA_CSV_FOLDER + 'sample_database.sqlite'
 
-logger = logging.getLogger('gage')
-log.debug(DB_PATH)
 db = SqliteExtDatabase(DB_PATH)
 
 
