@@ -167,7 +167,7 @@ def main():
             logger.debug('No update scheduled, getting ready to shutdown')
         
         try:
-            client.send_all()
+            result, successful_ids = client.send_all()
         except SendError:
             logger.warning('Unable to send samples')
 
