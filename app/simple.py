@@ -8,7 +8,7 @@ import os
 import time
 from logging.handlers import RotatingFileHandler
 
-from app import config, db, pcape, power, supervisor, ultrasound
+from app import config, pcape, power, supervisor, ultrasound
 from app.exceptions import SamplingError
 from app.gage_client.gage_client import Client
 from app.gage_client.gage_client.client import SendError
@@ -103,6 +103,9 @@ def main():
         data_csv_path = config.DATA_CSV_FOLDER + datetime.date.today().isoformat() + '.csv'
 
         leds.led_1 = True  # SD Card mounted and avaliable for storage
+
+        from db import db
+
         db.connect()
         db.create_tables([db.Sample], safe=True)
     else:
