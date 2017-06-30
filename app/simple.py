@@ -103,6 +103,7 @@ def main():
         data_csv_path = config.DATA_CSV_FOLDER + datetime.date.today().isoformat() + '.csv'
 
         leds.led_1 = True  # SD Card mounted and avaliable for storage
+        db.connect()
         db.create_tables([db.Sample], safe=True)
     else:
         logger.error('Micro SD card not avaliable for file storage')

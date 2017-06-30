@@ -31,5 +31,3 @@ class Sample(BaseModel):
     amps = pw.FloatField()
     uploaded = pw.BooleanField(default=False)
     result = pw.TextField(null=True)
-
-db.connect()
