@@ -107,7 +107,7 @@ def main():
         from app.db import db, Sample
 
         db.connect()
-        db.create_tables([db.Sample], safe=True)
+        db.create_tables([Sample], safe=True)
     else:
         logger.error('Micro SD card not avaliable for file storage')
         data_csv_path = False
