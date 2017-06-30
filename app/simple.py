@@ -205,7 +205,7 @@ def main():
     else:
         while True:
             sensor_cycle(ser, client, data_csv_path)
-            log_network_info()
+            log_network_info(leds)
 
 if __name__ == '__main__':
     main()
