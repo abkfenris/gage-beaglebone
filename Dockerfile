@@ -8,7 +8,8 @@ RUN apt-get install -y \
     avr-libc \
     avrdude \
     unzip \
-    libi2c-dev
+    libi2c-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # RUN sh -c "echo 'BB-UART2' > /sys/devices/platform/bone_capemgr/slots"
 RUN pip install --no-cache-dir cffi
