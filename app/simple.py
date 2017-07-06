@@ -16,6 +16,8 @@ def log_uncaught_exceptions(exc_type, exc_value, tb):
     try:
         from app import config, supervisor, pcape
         supervisor.toggle_update_check()
+        pcape.set_wdt_power(config.WATCHDOG_STOP_POWER_TIMEOUT)
+        pcape.set_wdt_start(config.WATCHDOG_START_POWER_TIMEOUT)
     except ImportError as e:
         logger.warning(f'Unable to import in uncaught exceptions: {e}')
     time.sleep(sleep_time)
@@ -23,6 +25,8 @@ def log_uncaught_exceptions(exc_type, exc_value, tb):
     if supervisor.update_in_progress():
         logger.info(f'Waiting for another {config.MAX_UPDATE_WAIT} seconds for an update')
         time.sleep(config.MAX_UPDATE_WAIT)
+    supervisor.shutdown()
+    
 
 
 sys.excepthook = log_uncaught_exceptions

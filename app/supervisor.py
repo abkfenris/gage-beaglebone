@@ -80,3 +80,5 @@ def toggle_update_check():
     if RESIN_SUPERVISOR_ADDRESS:
         requests.post(f'{RESIN_SUPERVISOR_ADDRESS}/v1/update?apikey={RESIN_SUPERVISOR_API_KEY}',
                       headers={'Content-Type': 'application/json'})
+    else:
+        logger.error('RESIN_SUPERVISOR ADDRESS or RESIN_SUPERVISOR_API_KEY not set')
