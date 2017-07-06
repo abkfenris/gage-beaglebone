@@ -11,7 +11,19 @@ def log_uncaught_exceptions(exc_type, exc_value, tb):
     import traceback
     sleep_time = 180
     logger.critical(f'Uncaught exception, sleeping for {sleep_time} to allow updates', exc_info=(exc_type, exc_value, tb))
+    
+    # give the app a chance to update
+    try:
+        from app import config, supervisor, pcape
+        supervisor.toggle_update_check()
+    except ImportError as e:
+        logger.warning(f'Unable to import in uncaught exceptions: {e}')
     time.sleep(sleep_time)
+
+    if supervisor.update_in_progress():
+        logger.info(f'Waiting for another {config.MAX_UPDATE_WAIT} seconds for an update')
+        time.sleep(config.MAX_UPDATE_WAIT)
+
 
 sys.excepthook = log_uncaught_exceptions
     
