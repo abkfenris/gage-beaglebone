@@ -1,7 +1,7 @@
 Adafruit_BBIO==1.0.3
 itsdangerous==0.24
 requests==2.13.0
-pyserial==3.3
+pyserial==3.4
 
 peewee==2.10.1
 #netifaces
