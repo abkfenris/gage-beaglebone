@@ -174,8 +174,9 @@ def main():
 
     if uptime() > config.MAX_UPTIME and config.POWER_CONSERVE:
         pcape.schedule_restart(config.STARTUP_REASONS, config.RESTART_TIME)
+        current_uptime = uptime()
         logger.error('System has been up for longer than the maximum allowed uptime.'
-                     + '({uptime()} > {config.MAX_UPTIME} seconds). Shutting down.')
+                     + f'({current_uptime} > {config.MAX_UPTIME} seconds). Shutting down.')
         supervisor.shutdown()
 
     if not config.TESTING_NO_CELL:
