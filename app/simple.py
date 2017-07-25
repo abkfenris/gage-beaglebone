@@ -8,10 +8,10 @@ from app.log import logger
 
 
 def log_uncaught_exceptions(exc_type, exc_value, tb):
-    import traceback
+    # import traceback
     sleep_time = 180
     logger.critical(f'Uncaught exception, sleeping for {sleep_time} to allow updates',
-                    exc_info=(exc_type, exc_value, traceback.format_tb(tb)))
+                    exc_info=(exc_type, exc_value, tb))
 
     # give the app a chance to update
     try:
