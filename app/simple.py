@@ -71,7 +71,7 @@ def sensor_cycle(ser, sample, data_csv_path):
         sample.create(
             timestamp=date,
             level=distance,
-            volt=volts,
+            volts=volts,
             amps=amps,
             uploaded=False)
 
@@ -176,7 +176,7 @@ def main():
         pcape.schedule_restart(config.STARTUP_REASONS, config.RESTART_TIME)
         current_uptime = uptime()
         logger.error('System has been up for longer than the maximum allowed uptime.'
-                     + f'({current_uptime} > {config.MAX_UPTIME} seconds). Shutting down.')
+                     + f' ({current_uptime} > {config.MAX_UPTIME} seconds). Shutting down.')
         supervisor.shutdown()
 
     if not config.TESTING_NO_CELL:
