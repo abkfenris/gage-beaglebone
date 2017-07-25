@@ -12,8 +12,10 @@ RUN apt-get install -y \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # RUN sh -c "echo 'BB-UART2' > /sys/devices/platform/bone_capemgr/slots"
-RUN pip install --no-cache-dir cffi
-RUN pip install --no-cache-dir smbus-cffi
+RUN pip install --no-cache-dir --extra-index-url=https://gergely.imreh.net/wheels/ \
+    cffi \
+    smbus-cffi \
+    dbus-python
 
 RUN mkdir gage
 WORKDIR /gage
@@ -36,7 +38,7 @@ RUN mkdir /gage/app
 WORKDIR /gage/app
 
 COPY /app/requirements.txt /gage/app
-RUN pip install --no-cache-dir -r /gage/app/requirements.txt
+RUN pip install --no-cache-dir --extra-index-url=https://gergely.imreh.net/wheels/ -r /gage/app/requirements.txt
 
 COPY app /gage/app
 

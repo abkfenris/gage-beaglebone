@@ -10,8 +10,9 @@ from app.log import logger
 def log_uncaught_exceptions(exc_type, exc_value, tb):
     import traceback
     sleep_time = 180
-    logger.critical(f'Uncaught exception, sleeping for {sleep_time} to allow updates', exc_info=(exc_type, exc_value, tb))
-    
+    logger.critical(f'Uncaught exception, sleeping for {sleep_time} to allow updates',
+                    exc_info=(exc_type, exc_value, traceback.format_tb(tb)))
+
     # give the app a chance to update
     try:
         from app import config, supervisor, pcape
@@ -26,28 +27,27 @@ def log_uncaught_exceptions(exc_type, exc_value, tb):
         logger.info(f'Waiting for another {config.MAX_UPDATE_WAIT} seconds for an update')
         time.sleep(config.MAX_UPDATE_WAIT)
     supervisor.shutdown()
-    
 
 
 sys.excepthook = log_uncaught_exceptions
-    
 
-import datetime
-import importlib
-import logging
-import os
-from logging.handlers import RotatingFileHandler
 
-from app import config, pcape, power, supervisor, ultrasound
-from app.exceptions import SamplingError
-from app.gage_client.gage_client import Client
-from app.gage_client.gage_client.client import SendError
-from app.log import formatter, log_levels
+import datetime  # noqa: E402
+import importlib  # noqa: E402
+import logging  # noqa: E402
+import os  # noqa: E402
+from logging.handlers import RotatingFileHandler  # noqa: E402
+
+from app import config, pcape, power, supervisor, ultrasound  # noqa: E402
+from app.exceptions import SamplingError  # noqa: E402
+from app.gage_client.gage_client import Client  # noqa: E402
+from app.gage_client.gage_client.client import SendError  # noqa: E402
+from app.log import formatter, log_levels  # noqa: E402
 from app.utils import (clean_sample_mean, log_network_info, mount_data_sd,
-                       remove_old_log_files, sd_avaliable, uptime, writerow)
+                       remove_old_log_files, sd_avaliable, uptime, writerow)  # noqa: E402
 
 
-def sensor_cycle(ser, client, data_csv_path):
+def sensor_cycle(ser, sample, data_csv_path):
     """Collect and log sensor data once"""
     try:
         distance = clean_sample_mean(ultrasound.read_serial,
@@ -68,9 +68,12 @@ def sensor_cycle(ser, client, data_csv_path):
     amps = round(power.check_amps(), 2)
 
     if distance:
-        client.reading('level', str(date), distance)
-        client.reading('volts', str(date), volts)
-        client.reading('amps', str(date), amps)
+        sample.create(
+            timestamp=date,
+            level=distance,
+            volt=volts,
+            amps=amps,
+            uploaded=False)
 
     if amps < 0:
         flow = 'charging'
@@ -83,6 +86,26 @@ def sensor_cycle(ser, client, data_csv_path):
     writerow((date, distance, 'mm ultrasound', volts, flow, amps), data_csv_path)
 
     time.sleep(config.WAIT)
+
+
+def send_samples(Sample, submit_url=config.SUBMIT_URL, submit_id=config.SUBMIT_ID, submit_key=config.SUBMIT_KEY):
+    client = Client(submit_url, submit_url, submit_id)
+    for sample in Sample.select().where(Sample.uploaded == False):
+        timestamp = str(sample.timestamp)
+        client.reading('level', timestamp, sample.level, id=sample.primary_key)
+        client.reading('volts', timestamp, sample.volts, id=sample.primary_key)
+        client.reading('amps', timestamp, sample.amps, id=sample.primary_key)
+    try:
+        result, successful_ids = client.send_all()
+        logger.info(f'Successfully sent at to {submit_url}')
+    except SendError as e:
+        logger.warning(f'Send error to {submit_url}: {e}')
+    else:
+        successful_ids = set(successful_ids)
+        for sample_id in successful_ids:
+            sample = Sample.get(Sample.id == sample_id)
+            sample.uploaded = True
+            sample.save()
 
 
 def main():
@@ -118,7 +141,7 @@ def main():
             logger.debug(f'Created syslog directory {config.FILE_LOG_FOLDER}')
 
         # set up file logging
-        file_handler = RotatingFileHandler(config.FILE_LOG_FOLDER + 'syslog', 
+        file_handler = RotatingFileHandler(config.FILE_LOG_FOLDER + 'syslog',
                                            maxBytes=10000000, backupCount=config.MAX_LOG_FILES)
         file_handler.setLevel(log_levels.get(config.FILE_LOG_LEVEL, logging.DEBUG))
         file_handler.setFormatter(formatter)
@@ -167,21 +190,18 @@ def main():
     # setup serial
     ser = ultrasound.serial_setup()
 
-    # setup client for submission
-    client = Client(config.SUBMIT_URL, config.SUBMIT_ID, config.SUBMIT_KEY)
-
     if config.POWER_CONSERVE and not STOP:
         pcape.set_wdt_power(config.WATCHDOG_STOP_POWER_TIMEOUT)
 
         for n in range(config.SAMPLES_PER_RUN):
-            sensor_cycle(ser, client, data_csv_path)
+            sensor_cycle(ser, Sample, data_csv_path)
             log_network_info(leds)
 
         logger.info(f'Sensing for {config.PRE_SHUTDOWN_TIME} more seconds to allow communication.')
         pcape.set_wdt_power(config.WATCHDOG_STOP_POWER_TIMEOUT)
 
         for n in range(config.PRE_SHUTDOWN_TIME // config.WAIT):
-            sensor_cycle(ser, client, data_csv_path)
+            sensor_cycle(ser, Sample, data_csv_path)
 
             log_network_info(leds)
 
@@ -192,18 +212,15 @@ def main():
                 logger.info(f'Update in progress: {supervisor.update_percentage()}%.',
                             f'Giving it {remaining_update_wait} more seconds.')
                 remaining_update_wait -= config.WAIT
-                sensor_cycle(ser, client, data_csv_path)
+                sensor_cycle(ser, Sample, data_csv_path)
                 log_network_info(leds)
 
                 if not supervisor.update_in_progress():
                     break
         else:
             logger.debug('No update scheduled, getting ready to shutdown')
-        
-        try:
-            result, successful_ids = client.send_all()
-        except SendError:
-            logger.warning('Unable to send samples')
+
+        send_samples(Sample)
 
         STOP = os.path.isfile(config.STORAGE_MOUNT_PATH + '/STOP')
 
@@ -220,7 +237,7 @@ def main():
 
     else:
         while True:
-            sensor_cycle(ser, client, data_csv_path)
+            sensor_cycle(ser, Sample, data_csv_path)
             log_network_info(leds)
 
 if __name__ == '__main__':
