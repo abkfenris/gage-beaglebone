@@ -1,6 +1,7 @@
 """
 Main script for gage to run. No longer simple.
 """
+import os
 import sys
 import time
 
@@ -8,24 +9,35 @@ from app.log import logger
 
 
 def log_uncaught_exceptions(exc_type, exc_value, tb):
-    # import traceback
-    sleep_time = 180
+    try:
+        sleep_time = int(os.environ.get('GAGE_EXCEPTION_SLEEP'))
+    except (TypeError, ValueError):
+        sleep_time = 60
     logger.critical(f'Uncaught exception, sleeping for {sleep_time} to allow updates',
                     exc_info=(exc_type, exc_value, tb))
 
     # give the app a chance to update
     try:
         from app import config, supervisor, pcape
-        supervisor.toggle_update_check()
-        pcape.set_wdt_power(config.WATCHDOG_STOP_POWER_TIMEOUT)
-        pcape.set_wdt_start(config.WATCHDOG_START_POWER_TIMEOUT)
     except ImportError as e:
         logger.warning(f'Unable to import in uncaught exceptions: {e}')
+    else:
+        supervisor.toggle_update_check()
+        pcape.schedule_restart(config.STARTUP_REASONS, config.RESTART_TIME)
+        pcape.set_wdt_stop(config.WATCHDOG_STOP_POWER_TIMEOUT)
+        pcape.log_powercape_info()
+
     time.sleep(sleep_time)
 
     if supervisor.update_in_progress():
+        pcape.set_wdt_stop(config.WATCHDOG_STOP_POWER_TIMEOUT)
         logger.info(f'Waiting for another {config.MAX_UPDATE_WAIT} seconds for an update')
         time.sleep(config.MAX_UPDATE_WAIT)
+    
+
+    pcape.schedule_restart(config.STARTUP_REASONS, config.RESTART_TIME)
+    pcape.log_powercape_info()
+
     supervisor.shutdown()
 
 
@@ -35,7 +47,6 @@ sys.excepthook = log_uncaught_exceptions
 import datetime  # noqa: E402
 import importlib  # noqa: E402
 import logging  # noqa: E402
-import os  # noqa: E402
 from logging.handlers import RotatingFileHandler  # noqa: E402
 
 from app import config, pcape, power, supervisor, ultrasound  # noqa: E402
@@ -44,7 +55,7 @@ from app.gage_client.gage_client import Client  # noqa: E402
 from app.gage_client.gage_client.client import SendError  # noqa: E402
 from app.log import formatter, log_levels  # noqa: E402
 from app.utils import (clean_sample_mean, log_network_info, mount_data_sd,
-                       remove_old_log_files, sd_avaliable, uptime, writerow)  # noqa: E402
+                       remove_old_log_files, sd_avaliable, uptime, writerow, check_config)  # noqa: E402
 
 
 def sensor_cycle(ser, sample, data_csv_path):
@@ -89,7 +100,9 @@ def sensor_cycle(ser, sample, data_csv_path):
 
 
 def send_samples(Sample, submit_url=config.SUBMIT_URL, submit_id=config.SUBMIT_ID, submit_key=config.SUBMIT_KEY):
-    client = Client(submit_url, submit_url, submit_id)
+    client = Client(submit_url, submit_id, submit_key)
+    # Intentionally broken client
+    # client = Client(submit_url, submit_id, submit_id)
     for sample in Sample.select().where(Sample.uploaded == False):
         timestamp = str(sample.timestamp)
         client.reading('level', timestamp, sample.level, id=sample.primary_key)
@@ -97,10 +110,10 @@ def send_samples(Sample, submit_url=config.SUBMIT_URL, submit_id=config.SUBMIT_I
         client.reading('amps', timestamp, sample.amps, id=sample.primary_key)
     try:
         result, successful_ids = client.send_all()
-        logger.info(f'Successfully sent at to {submit_url}')
     except SendError as e:
-        logger.warning(f'Send error to {submit_url}: {e}')
+        logger.warning(f'Send error to {submit_url}: {e}', exc_info=e)
     else:
+        logger.info(f'Successfully sent at to {submit_url}')
         successful_ids = set(successful_ids)
         for sample_id in successful_ids:
             sample = Sample.get(Sample.id == sample_id)
@@ -113,7 +126,7 @@ def main():
     Run the main stuff
     """
     pcape.set_system_time()
-    pcape.set_wdt_power(config.WATCHDOG_STOP_POWER_TIMEOUT)
+    pcape.set_wdt_stop(config.WATCHDOG_STOP_POWER_TIMEOUT)
     pcape.set_wdt_start(config.WATCHDOG_START_POWER_TIMEOUT)
 
     leds = pcape.StatusLEDs()
@@ -165,20 +178,28 @@ def main():
         logger.error('Micro SD card not avaliable for file storage')
         data_csv_path = False
         STOP = False
+    
+    check_config()
 
+    # shutdown quickly if the power is too low
     if power.check_volts() < config.MIN_VOLTAGE:
         logger.error(f'System voltage has fallen below minimum voltage specified ({config.MIN_VOLTAGE} V).',
                      f'Shutting down for {config.MIN_VOLTAGE_RESTART_TIME} min to charge.')
         pcape.schedule_restart(config.STARTUP_REASONS, config.MIN_VOLTAGE_RESTART_TIME)
         supervisor.shutdown()
 
+    # if the system has been awake too long (due to crashing container or otherwise)
+    # shutdown quickly
     if uptime() > config.MAX_UPTIME and config.POWER_CONSERVE:
         pcape.schedule_restart(config.STARTUP_REASONS, config.RESTART_TIME)
         current_uptime = uptime()
         logger.error('System has been up for longer than the maximum allowed uptime.'
                      + f' ({current_uptime} > {config.MAX_UPTIME} seconds). Shutting down.')
         supervisor.shutdown()
+    
+    pcape.log_powercape_info()
 
+    # setup cell modem unless in testing mode
     if not config.TESTING_NO_CELL:
         # setup cell
         cell_module_str, cell_method_str = config.CELL_TYPE.rsplit('.', 1)
@@ -191,27 +212,31 @@ def main():
     # setup serial
     ser = ultrasound.serial_setup()
 
+    # If the stop file is not found, and the gage is in power conserve (normal) mode
     if config.POWER_CONSERVE and not STOP:
-        pcape.set_wdt_power(config.WATCHDOG_STOP_POWER_TIMEOUT)
+        pcape.set_wdt_stop(config.WATCHDOG_STOP_POWER_TIMEOUT)
 
+        # Primary sensing period
         for n in range(config.SAMPLES_PER_RUN):
             sensor_cycle(ser, Sample, data_csv_path)
             log_network_info(leds)
 
         logger.info(f'Sensing for {config.PRE_SHUTDOWN_TIME} more seconds to allow communication.')
-        pcape.set_wdt_power(config.WATCHDOG_STOP_POWER_TIMEOUT)
+        pcape.set_wdt_stop(config.WATCHDOG_STOP_POWER_TIMEOUT)
 
+        # Update check sensing period
         for n in range(config.PRE_SHUTDOWN_TIME // config.WAIT):
             sensor_cycle(ser, Sample, data_csv_path)
-
             log_network_info(leds)
 
+        # Download and apply updates if avaliable
         if supervisor.update_in_progress():
             remaining_update_wait = config.MAX_UPDATE_WAIT
             for x in range(remaining_update_wait // config.WAIT):
-                pcape.set_wdt_power(config.WATCHDOG_STOP_POWER_TIMEOUT)
-                logger.info(f'Update in progress: {supervisor.update_percentage()}%.',
-                            f'Giving it {remaining_update_wait} more seconds.')
+                pcape.set_wdt_stop(config.WATCHDOG_STOP_POWER_TIMEOUT)
+                update_percentage = supervisor.update_percentage()
+                logger.info(f'Update in progress: {update_percentage}%.'
+                            + f' Giving it {remaining_update_wait} more seconds.')
                 remaining_update_wait -= config.WAIT
                 sensor_cycle(ser, Sample, data_csv_path)
                 log_network_info(leds)
@@ -221,16 +246,15 @@ def main():
         else:
             logger.debug('No update scheduled, getting ready to shutdown')
 
+        pcape.set_wdt_stop(config.WATCHDOG_STOP_POWER_TIMEOUT)
         send_samples(Sample)
 
-        STOP = os.path.isfile(config.STORAGE_MOUNT_PATH + '/STOP')
+        STOP = os.path.isfile(config.STORAGE_MOUNT_PATH + '/STOP')  # NOQA: N806
 
         if not STOP:
             pcape.schedule_restart(config.STARTUP_REASONS, config.RESTART_TIME)
 
-            logger.debug('Powercape info:')
-            for line in pcape.powercape_info():
-                logger.debug('   ' + line)
+            pcape.log_powercape_info()
 
             leds.led_1, leds.led_2 = False, False
 

@@ -2,15 +2,13 @@
 Utility classes
 """
 import csv
-import logging
 import os
 import signal
 import statistics
 import subprocess
 
 from app import cell, config, exceptions
-
-logger = logging.getLogger('gage')
+from app.log import logger
 
 
 class TimeoutError(Exception):
@@ -127,3 +125,34 @@ def clean_sample_mean(sample_func, ser, low, high, min_samples, max_attempts, ma
 
     stdev = round(statistics.stdev(cleaned), 2)
     raise exceptions.SamplingError(f'Stdev ({stdev}) did not meet criteria ({max_std_dev}) in {max_attempts}')
+
+
+def check_config():
+    """
+    Checks config values to make sure they are reasonable
+    """
+
+    # check that register values are not too high
+    registers = ((config.RESTART_TIME, 'GAGE_RESTART_TIME'),
+                 (config.MIN_VOLTAGE_RESTART_TIME, 'GAGE_MIN_VOLTAGE_RESTART_TIME'),
+                 (config.WATCHDOG_RESET_TIMEOUT, 'GAGE_WATCHDOG_RESET_TIMEOUT'),
+                 (config.WATCHDOG_POWER_TIMEOUT, 'GAGE_WATCHDOG_POWER_TIMEOUT'),
+                 (config.WATCHDOG_STOP_POWER_TIMEOUT, 'GAGE_WATCHDOG_STOP_POWER_TIMEOUT'),
+                 (config.WATCHDOG_START_POWER_TIMEOUT, 'GAGE_WATCHDOG_START_POWER_TIMEOUT'))
+    for register, register_name in registers:
+        if register > 255:
+            logger.error(f'{register_name} is set to a value greater than 255 ({register}). '
+                         + f'It will instead be interperted as {register % 255}')
+
+    # check that primary sensing period isn't longer than timeout
+    sensor_cycle_time = config.WAIT + 5
+    if (sensor_cycle_time * config.SAMPLES_PER_RUN) > config.WATCHDOG_STOP_POWER_TIMEOUT:
+        logger.error('Aproximate time of main sensor loop ((GAGE_WAIT + sensing time) * GAGE_SAMPLES_PER_RUN)'
+                     + ' is greater than GAGE_WATCHDOG_STOP_POWER_TIMEOUT.'
+                     + f' ({sensor_cycle_time * config.SAMPLES_PER_RUN} > {config.WATCHDOG_STOP_POWER_TIMEOUT})')
+
+    # check that update check sensing period isn't longer than timeout
+    if config.PRE_SHUTDOWN_TIME > config.WATCHDOG_STOP_POWER_TIMEOUT:
+        logger.error('Approximate time of update check loop (GAGE_PRE_SHUTDOWN_TIME) is greater than'
+                     + ' GAGE_WATCHDOG_STOP_POWER_TIMEOUT.'
+                     + f' ({config.PRE_SHUTDOWN_TIME} > {config.GAGE_WATCHDOG_STOP_POWER_TIMEOUT})')

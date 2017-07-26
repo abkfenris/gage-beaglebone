@@ -1,14 +1,14 @@
 """
 Tools for controlling the powercamp and power in general
 """
-import logging
 import os
 import subprocess
 import datetime
 
-
 from Adafruit_I2C import Adafruit_I2C
-import requests
+
+from app.log import logger
+from app import config
 
 RESIN_SUPERVISOR_API_KEY = os.environ.get('RESIN_SUPERVISOR_API_KEY', None)
 RESIN_SUPERVISOR_ADDRESS = os.environ.get('RESIN_SUPERVISOR_ADDRESS', None)
@@ -16,10 +16,8 @@ POWERCAPE_PATH = '/gage/PowerCape/utils/power'
 
 powercapeI2C = Adafruit_I2C(0x21, 2)
 
-logger = logging.getLogger('gage')
 
-
-def set_time(cycle_time):
+def set_time(cycle_time=config.RESTART_TIME):
     """
     Set time in minutes that the PowerCape will wait
     to start the BeagleBone up after shutdown.
@@ -45,7 +43,7 @@ def set_wdt_reset(cycle_time):
 
 def set_wdt_power(cycle_time):
     """
-    Timout in seconds before the PowerCape cuts power
+    Timout in seconds before the PowerCape cycles power
     to the BeagleBone
     """
     logger.info(f'Setting watchdog power cutoff time to {cycle_time} seconds.')
@@ -55,9 +53,9 @@ def set_wdt_power(cycle_time):
         logger.error('Error setting watchdog power cutoff timeout')
 
 
-def set_wdt_stop(cycle_time):
+def set_wdt_stop(cycle_time=config.WATCHDOG_STOP_POWER_TIMEOUT):
     """
-    Timeout in seconds and cut power  (for Beaglebones that 
+    Timeout in seconds and cut power  (for Beaglebones that
     don't cut power). Clears on shutdown.
     """
     logger.info(f'Setting watchdog power cuttof time to {cycle_time} seconds.')
@@ -67,7 +65,7 @@ def set_wdt_stop(cycle_time):
         logger.error('Error setting watchdog power cut timeout')
 
 
-def set_wdt_start(cycle_time):
+def set_wdt_start(cycle_time=config.WATCHDOG_START_POWER_TIMEOUT):
     """
     Startup timeout in seconds. If I2C activity hasn't been seen on startup
     after this time then it will cycle power on timeout.
@@ -96,7 +94,7 @@ def startup_reasoner(hex_string):
     return ', '.join(output)
 
 
-def set_startup_reasons(startup_reasons):
+def set_startup_reasons(startup_reasons=config.STARTUP_REASONS):
     """
     Set startup reason for powercape
     """
@@ -184,10 +182,16 @@ class StatusLEDs(object):
         self.set_leds()
 
 
-def schedule_restart(startup_reasons, restart_time):
+def schedule_restart(startup_reasons=config.STARTUP_REASONS, restart_time=config.RESTART_TIME):
     """
     Schedule a restart
     """
     set_startup_reasons(startup_reasons)
     set_cape_time()
     set_time(restart_time)
+
+
+def log_powercape_info():
+    logger.debug('Powercape info:')
+    for line in powercape_info():
+        logger.debug('   ' + line)

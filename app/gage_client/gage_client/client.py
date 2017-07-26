@@ -1,4 +1,5 @@
 from itsdangerous import JSONWebSignatureSerializer
+import json
 import requests
 import logging
 
@@ -63,7 +64,7 @@ class Client(object):
         raise NotImplementedError
 
 
-class Client_0_1(Client):
+class Client_0_1(Client):  # NOQA: N801
     def __new__(cls, url, id, password):
         instance = object.__new__(Client_0_1)
         return instance
@@ -113,10 +114,15 @@ class Client_0_1(Client):
 
     def send_all(self):
         """
-        Send all samples to server
+        Send all samples to the server
         """
+        return self.send_selected(self.samples)
 
-        payload = {'samples': self.samples,
+    def send_selected(self, samples):
+        """
+        Send selected samples to server
+        """
+        payload = {'samples': samples,
                    'gage': {'id': self.id}}
 
         data = self.serializer.dumps(payload)
@@ -124,13 +130,34 @@ class Client_0_1(Client):
 
         r = requests.post(self.url, data=data)
 
-        try:
-            r.json()
-        except ValueError:
-            exc = SendError('Failed to send')
-            exc.fail = self.samples
-            exc.sucessful = sucessful_ids
-            raise exc
+        # 413 means that the attempted payload is too large.
+        # Split the samples in half and try both half
+        if r.status_code == 413:
+            logging.info('Samples too large for payload, splitting in half and trying again')
+            half = len(samples)//2
+
+            try:
+                first_result, first_sucessful = self.send_selected(samples[:half])
+                second_result, second_sucessful = self.send_selected(samples[half:])
+            except SendError as e:
+                logging.warning('One of the send_selected halfs failed')
+
+            try:
+                first_sucessful
+            except UnboundLocalError:
+                first_sucessful = []
+
+            try:
+                second_sucessful
+            except UnboundLocalError:
+                second_sucessful = []
+
+            sucessful = first_sucessful + second_sucessful
+
+            if len(sucessful) > 0:
+                return (True, sucessful)
+            else:
+                return (False, [])
 
         # Check status codes to see if there was an authentication error
         if r.status_code == 401:
@@ -139,8 +166,16 @@ class Client_0_1(Client):
             exc.sucessful = sucessful_ids
             raise exc
 
+        try:
+            r.json()
+        except (ValueError, json.decoder.JSONDecodeError):
+            exc = SendError('Failed to send')
+            exc.fail = self.samples
+            exc.sucessful = sucessful_ids
+            raise exc
+
         # Else we did something
-        elif r.status_code == 200 and r.json()['result'] == 'created':
+        if r.status_code == 200 and r.json()['result'] == 'created':
             for sample in r.json()['samples']:
                 sucessful_ids.append(sample['sender_id'])
             self.samples = [x for x in self.samples if not x['sender_id'] in sucessful_ids]
