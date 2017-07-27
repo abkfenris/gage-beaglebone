@@ -3,7 +3,7 @@ import logging, subprocess, time
 # import dbus
 import NetworkManager
 
-from cell import CellConnection, list_connection_ids
+from app.cell import CellConnection, list_connection_ids
 
 
 logger = logging.getLogger('gage')
