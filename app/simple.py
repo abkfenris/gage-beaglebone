@@ -100,25 +100,31 @@ def sensor_cycle(ser, sample, data_csv_path):
 
 
 def send_samples(Sample, submit_url=config.SUBMIT_URL, submit_id=config.SUBMIT_ID, submit_key=config.SUBMIT_KEY):
-    client = Client(submit_url, submit_id, submit_key)
-    # Intentionally broken client
-    # client = Client(submit_url, submit_id, submit_id)
-    for sample in Sample.select().where(Sample.uploaded == False):
-        timestamp = str(sample.timestamp)
-        client.reading('level', timestamp, sample.level, id=sample.primary_key)
-        client.reading('volts', timestamp, sample.volts, id=sample.primary_key)
-        client.reading('amps', timestamp, sample.amps, id=sample.primary_key)
-    try:
-        result, successful_ids = client.send_all()
-    except SendError as e:
-        logger.warning(f'Send error to {submit_url}: {e}', exc_info=e)
-    else:
-        logger.info(f'Successfully sent at to {submit_url}')
-        successful_ids = set(successful_ids)
-        for sample_id in successful_ids:
-            sample = Sample.get(Sample.id == sample_id)
-            sample.uploaded = True
-            sample.save()
+    samples = [sample for sample in Sample.select().where(Sample.uploaded == False)]
+    
+    chunk_size = 10
+
+    sample_chunks = [samples[i:i + chunk_size] for i in range(0, len(samples), chunk_size)]
+
+    for chunk in sample_chunks:
+        client = Client(submit_url, submit_id, submit_key)
+        # Intentionally broken client
+        # client = Client(submit_url, submit_id, submit_id)
+        for sample in chunk:
+            timestamp = str(sample.timestamp)
+            client.reading('level', timestamp, sample.level, id=sample.primary_key)
+            client.reading('volts', timestamp, sample.volts, id=sample.primary_key)
+            client.reading('amps', timestamp, sample.amps, id=sample.primary_key)
+        try:
+            result, successful_ids = client.send_all()
+        except SendError as e:
+            logger.warning(f'Send error to {submit_url}: {e}', exc_info=e)
+        else:
+            logger.info(f'Successfully sent at to {submit_url}')
+            successful_ids = set(successful_ids)
+            logger.debug(f'Sucessful ids ({successful_ids})')
+            query = Sample.update(uploaded=True).where(Sample.primary_key.in_(successful_ids))
+            query.execute()
 
 
 def main():
