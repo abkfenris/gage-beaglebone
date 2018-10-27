@@ -1,5 +1,5 @@
 Adafruit_BBIO==1.0.3
-itsdangerous==0.24
+itsdangerous==1.1.0
 requests==2.13.0
 pyserial==3.3
 
