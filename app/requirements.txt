@@ -1,4 +1,4 @@
-Adafruit_BBIO==1.0.3
+Adafruit_BBIO==1.1.1
 itsdangerous==0.24
 requests==2.13.0
 pyserial==3.3
