@@ -9,4 +9,4 @@ peewee==2.10.1
 python-networkmanager==2.0.1
 
 ipython==5.3.0
-raven==6.1.0
+raven==6.10.0
