@@ -3,7 +3,7 @@ itsdangerous==0.24
 requests==2.13.0
 pyserial==3.3
 
-peewee==2.10.1
+peewee==3.9.6
 #netifaces
 
 python-networkmanager==2.0.1
